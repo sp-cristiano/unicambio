@@ -1,0 +1,15 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.associations": {
+      "unicambio.h": "c",
+      "defaultexchangerate.h": "c",
+      "defaultcurrency.h": "c",
+      "messages.h": "c"
+    }
+  }
+}
