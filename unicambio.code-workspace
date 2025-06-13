@@ -6,10 +6,14 @@
   ],
   "settings": {
     "files.associations": {
-      "unicambio.h": "c",
+      "config.h": "c",
       "defaultexchangerate.h": "c",
       "defaultcurrency.h": "c",
-      "messages.h": "c"
+      "messages.h": "c",
+      "defaultrole.h": "c",
+      "defaulttransaction.h": "c",
+      "defaultuser.h": "c",
+      "structures.h": "c"
     }
   }
 }
