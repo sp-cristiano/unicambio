@@ -22,4 +22,5 @@ Including internal header files.
 */
 void userMenu(SystemData *sysData)
 {
+	// TODO: IMPLEMENT THE FUNCTION TO DISPLAY THE USER MENU
 }

@@ -11,7 +11,9 @@ Including internal header files.
 [Incluindo arquivos de cabeçalho internos.]
 *******************************************************************************
 */
-#include "unicambio.h"
+#include "../include/config.h"
+#include "../include/structures.h"
+
 
 int main()
 {

@@ -12,8 +12,8 @@ Including internal header files.
 ******************************************************************************
 */
 #include "../include/config.h"
-#include "../include/structures.h"
 #include "../include/messages.h"
+#include "../include/structures.h"
 #include "../include/globals.h"
 #include "../include/adminMenu.h"
 

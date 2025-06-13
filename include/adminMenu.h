@@ -17,10 +17,11 @@ This file is the header file for the unicambio project.
 [Protótipos de funções.]
 ******************************************************************************************
 */
+// Function to start session [Função para iniciar a sessão]
+void startSessionMenu(SystemData *sysData);
+
 // Function to display the admin menu [Função para exibir o menu do administrador]
 void adminMenu(SystemData *sysData);
 
-// Function to start session [Função para iniciar a sessão]
-void startSessionMenu(SystemData *sysData);
 
 #endif // ADMIN_MENU_H

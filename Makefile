@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Iinclude -Wall -g
 
 #  Use wildcard to include all .c files
-SRCS = $(wildcard src/functions/userFunctions/*.c) $(wildcard src/functions/systemFunctions/*.c) $(wildcard src/functions/roleFunctions/*.c) $(wildcard src/functions/oauthFunctions/*.c) $(wildcard src/functions/defaultSetup/*.c)  $(wildcard src/functions/otherFunctions/*.c) $(wildcard src/globalVariables/*.c) $(wildcard src/*.c)
+SRCS = $(wildcard src/functions/userFunctions/*.c) $(wildcard src/functions/systemFunctions/*.c) $(wildcard src/functions/oauthFunctions/*.c) $(wildcard src/functions/menuFunctions/*.c) $(wildcard src/functions/defaultSetup/*.c)  $(wildcard src/functions/otherFunctions/*.c) $(wildcard src/globalVariables/*.c) $(wildcard src/*.c)
 
 # Create object files from the source files
 OBJS = $(SRCS:.c=.o)

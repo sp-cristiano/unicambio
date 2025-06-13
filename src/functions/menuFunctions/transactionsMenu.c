@@ -20,3 +20,6 @@ Including internal header files.
 ******************************************************************************
 ******************************************************************************
 */
+void transactionsMenu(SystemData *sysData){
+	// TODO: IMPLEMENT THE FUNCTION TO DISPLAY THE TRANSACTIONS MENU
+}

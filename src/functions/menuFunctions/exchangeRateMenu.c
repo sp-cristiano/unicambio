@@ -22,4 +22,5 @@ Including internal header files.
 */
 void exchangeRateMenu(SystemData *sysData)
 {
+	// TODO: IMPLEMENT THE FUNCTION TO DISPLAY THE EXCHANGE RATE MENU
 }

@@ -12,6 +12,7 @@ Including internal header files.
 */
 #include "../include/config.h"
 #include "../include/messages.h"
+#include "../include/globals.h"
 #include "../include/structures.h"
 #include "../include/defaultTransaction.h"
 

@@ -21,5 +21,5 @@ Including internal header files.
 ******************************************************************************
 */
 void currencyMenu(SystemData *sysData){
-	// TODO: CURRENCY MENU
+	// TODO: IMPLEMENT THE FUNCTION TO DISPLAY THE CURRENCY MENU
 }
