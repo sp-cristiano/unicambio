@@ -87,11 +87,17 @@ Se a entrada for 1, imprime a hora
 Se a entrada não for 0 ou 1, imprime a data e hora]
 ******************************************************************************
 */
-const char *getCurrentDateTime(int type)
+char *getCurrentDateTime(int type)
 {
 	static char dateTime[MAX_DATE_LENGTH];
 	time_t now = time(NULL);
 	struct tm *t = localtime(&now);
+
+	if (!t)
+	{
+		snprintf(dateTime, sizeof(dateTime), "%s", UI_ERROR_INVALID_TIME);
+		return dateTime; // Return error message if localtime fails
+	}
 
 	if (type == 0)
 	{ // Date
@@ -229,4 +235,54 @@ void exitProgram(SystemData *sysData)
 		startSession(sysData); // Return to the session menu [Retornar ao menu de sessão]
 		return;								 // Return to the previous menu [Retornar ao menu anterior]
 	}
+}
+
+char *get_env_value(const char *key, const char *filename)
+{
+	FILE *file = fopen(filename, "r");
+	if (file == NULL)
+	{
+		printf("%s\n", UI_ERROR_ENV_FILE_NOT_FOUND);
+		ruturn NULL;
+	}
+	static char line[512]; // static to persist after function [estático para persistir depois da função]
+	while (fgets(line, sizeof(line), file))
+	{
+		char *eq = strch(line, '=');
+		if (!eq)
+		{
+			continue;
+		}
+		*eq = '\0';
+		char *k = line;
+		char *v = eq + 1;
+
+		// Remove trailing newline from value
+		v[strcpn(v, "\r\n")] = 0;
+
+		if (strcmp(k, key) == 0)
+		{
+			fclose(file);
+			return strdup(v);
+		}
+	}
+	fclose(file);
+	return NULL;
+}
+
+int load_env(const char *filename)
+{
+	ADMIN_USER_PASSWORD = get_env_value("ADMIN_USER_PASSWORD", filename);
+	ADMIN_USER_EMAIL = get_env_value("ADMIN_USER_EMAIL", filename);
+	ADMIN_USER_PHONE = get_env_value("ADMIN_USER_PHONE", filename);
+
+	return ADMIN_USER_PASSWORD && ADMIN_USER_EMAIL && ADMIN_USER_PHONE;
+}
+
+// free env memory
+void free_env()
+{
+	free(ADMIN_USER_PASSWORD);
+	free(ADMIN_USER_EMAIL);
+	free(ADMIN_USER_PHONE);
 }

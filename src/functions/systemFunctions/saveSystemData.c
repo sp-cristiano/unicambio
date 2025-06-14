@@ -10,7 +10,14 @@ Including internal header files.
 [Incluindo arquivos de cabeçalho internos.]
 ******************************************************************************
 */
-#include "../include/unicambio.h"
+#include "../include/config.h"
+#include "../include/structures.h"
+#include "../include/systemFunctions.h"
+#include "../include/userFunctions.h"
+#include "../include/roleFunctions.h"
+#include "../include/currencyFunctions.h"
+#include "../include/exchangeRateFunctions.h"
+#include "../include/transactionFunctions.h"
 
 /*
 ******************************************************************************

@@ -1,5 +1,6 @@
 CC = gcc
 CFLAGS = -Iinclude -Wall -g
+LDFLAGS = -lsodium
 
 #  Use wildcard to include all .c files
 SRCS = $(wildcard src/functions/userFunctions/*.c) $(wildcard src/functions/systemFunctions/*.c) $(wildcard src/functions/oauthFunctions/*.c) $(wildcard src/functions/menuFunctions/*.c) $(wildcard src/functions/defaultSetup/*.c)  $(wildcard src/functions/otherFunctions/*.c) $(wildcard src/globalVariables/*.c) $(wildcard src/*.c)

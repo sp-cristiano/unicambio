@@ -1,34 +1,35 @@
+/**
+ * @file adminMenu.c
+ * @author Chinedum Odili
+ * @brief This file contains the admin menu and the start session menu
+ * [Este arquivo contém o menu do administrador e o menu de inicio de sessão]
+ * @param sysData Pointer to the system data structure containing user, role, currency, exchange rate, and transaction information.
+ */
 /*
-******************************************************************************
-This file contains all the admin menu functions for the unicambio project.
-[Este arquivo contém todas as funções do menu do administrador para o projeto unicambio.]
-******************************************************************************
+==================================================================================================================
+																			File inclusion directives for internal header files
+																			[Diretivas de inclusão de arquivos de cabeçalho internos]
+==================================================================================================================
 */
 
-/*
-******************************************************************************
-Including internal header files.
-[Incluindo arquivos de cabeçalho internos.]
-******************************************************************************
-*/
 #include "../include/config.h"
 #include "../include/messages.h"
 #include "../include/structures.h"
 #include "../include/globals.h"
 #include "../include/adminMenu.h"
+#include "../include/userMenu.h"				 // TODO: Will create the user menu
+#include "../include/currencyMenu.h"		 // TODO: will create the currency menu
+#include "../include/roleMenu.h"				 // TODO: will create the role menu
+#include "../include/exchangeRateMenu.h" // TODO: will create the exchange rate menu
+#include "../include/transactionMenu.h"	 // TODO: will create the transaction menu
+#include "../include/utilities.h"
+#include "../include/oauthFunctions.h"
 
 /*
-******************************************************************************
-this will display the admin menu
-[Esta função exibirá o menu do administrador]
-******************************************************************************
-*/
-
-/*
-******************************************************************************
-This function will start the session.
-[Esta função iniciará a sessão.]
-******************************************************************************
+==================================================================================================================
+																			This function will start the main menu session
+																			[Esta função iniciara a sessão do menu principal]
+==================================================================================================================
 */
 void startSessionMenu(SystemData *sysData)
 {
@@ -58,6 +59,12 @@ void startSessionMenu(SystemData *sysData)
 	} while ((choice < 0 || choice > 1) && exitFlag == FALSE && !is_authenticated);
 }
 
+/*
+==================================================================================================================
+																			This function will be shown once the admin is authenticated.
+																			[Esta função será mostrada uma vez que o admin estiver autenticado.]
+==================================================================================================================
+*/
 void adminMenu(SystemData *sysData)
 {
 	if (sysData == NULL)

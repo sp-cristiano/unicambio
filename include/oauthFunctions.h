@@ -26,5 +26,9 @@ void loginPage(SystemData *sysData);
 void grantLoginAccess(SystemData *sysData, int currenUserID);
 // Function to authenticate user [Função para autenticar usuário]
 int authenticateUser(SystemData *sysData, const char *username, const char *password);
+// Function to hash password [Função para hashear senha]
+char *hashPassword(const char *password);
+// Function to verify password [Função para verificar senha]
+int verifyPassword(const char *password, const char *hashedPassword);
 
 #endif // OAUTH_FUNCTIONS_H

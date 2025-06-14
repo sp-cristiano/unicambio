@@ -24,7 +24,7 @@ This file is the header file for the unicambio project.
 
 // *** PROTOTYPES FOR USER ROLES FUNCTIONS [PROTÓTIPOS PARA FUNÇÕES DE PAPÉIS DE USUÁRIO] ***
 // Function to create a new role [Função para criar um novo papel]
-void createRole(SystemData *sysData, const char *role_name, const char *description, const char *created_at, const char *updated_at, const char *deleted_at);
+void createRole(SystemData *sysData, const char *role_name, const char *description, time_t created_at_date, time_t created_at_time, time_t updated_at_date, time_t updated_at_time, time_t deleted_at_date, time_t deleted_at_time);
 // Function to save role to file [Função para salvar papel no arquivo]
 void saveRoleData(SystemData *sysData);
 // Function to load role data from file [Função para carregar dados de papel do arquivo]

@@ -8,15 +8,17 @@ This file is the header file for the unicambio project.
 [Este arquivo é o arquivo de cabeçalho para o projeto unicambio.]
 *****************************************************************************************
 */
-#ifndef USER_FUNCTIONS
-#define USER_FUNCTIONS
+#ifndef SYSTEM_FUNCTIONS_H
+#define SYSTEM_FUNCTIONS_H
 
 #include "../include/structures.h"
-
 /*
 ******************************************************************************************
 [Protótipos de funções.]
 ******************************************************************************************
 */
-void createUser(SystemData *sysData, const char *name, const char *username, const char *email, const char *password, const char *phone, int is_active, const time_t created_at, const time_t last_seen, const time_t deleted_at);
-#endif // USER_FUNCTIONS
+
+void saveSystemData(SystemData *sysData); // Save system data to file [Salvar dados do sistema no arquivo]
+void loadSystemData(SystemData *sysData); // Load system data from file [Carregar dados do sistema do arquivo]
+
+#endif // SYSTEM_FUNCTIONS_H

@@ -15,6 +15,8 @@ Including internal header files.
 #include "../include/globals.h"
 #include "../include/structures.h"
 #include "../include/defaultRole.h"
+#include "../include/utilities.h"
+#include "../include/roleFunctions.h"
 
 /*
 ******************************************************************************
@@ -42,10 +44,17 @@ void addRoleDefaultProfile(SystemData *sysData)
 		// Add default role to the role structure [Adicionar papel padrão à estrutura de papel]
 		char *role_name = ADMIN_USER;								// Default role name for admin [Nome do papel padrão para administrador]
 		char *description = ADMIN_USER_DESCRIPTION; // Default role description for admin [Descrição do papel padrão para administrador]
-		char *created_at = getCurrentDateTime(2);		// Current date and time [Data e hora atual]
-		char *updated_at = getCurrentDateTime(2);		// Current date and time [Data e hora atual]
-		char *deleted_at = NULL;										// No deletion date for default role [Sem data de exclusão para o papel padrão]
-		createRole(sysData, role_name, description, created_at, updated_at, deleted_at);
+
+		// Get current date and time for created_at and updated_at [Obter data e hora atual para created_at e updated_at]
+		time_t timeStamp = getCurrentDateTime(1), dateStamp = getCurrentDateTime(0), created_at_time, created_at_date, updated_at_date, updated_at_time, deleted_at_date, deleted_at_time;
+
+		created_at_time = timeStamp; // Current date and time [Data e hora atual]
+		created_at_date = dateStamp;
+		updated_at_time = timeStamp; // Current date and time [Data e hora atual]
+		updated_at_date = dateStamp;
+		deleted_at_time = NULL;			// No deletion date for default role [Sem data de exclusão para o papel padrão]
+		deleted_at_date = NULL;
+		createRole(sysData, role_name, description, created_at_date, created_at_time, updated_at_date, updated_at_time, deleted_at_date, deleted_at_time);
 		sleep(MID_SLEEP);
 		return;
 	}
@@ -54,3 +63,4 @@ void addRoleDefaultProfile(SystemData *sysData)
 		fclose(checkRoleFile);
 		return; // If the file exists, do not add the default role [Se o arquivo existir, não adicionar o papel padrão]
 	}
+}

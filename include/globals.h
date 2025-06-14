@@ -23,7 +23,7 @@ Global variables.
 */
 // extern char *current_language; // Pointer to the current language setting
 extern char *current_date, *current_time;
-extern const char *currentUserName, *currentUserRole;
+extern const char *currentUserName, *currentUserRole, *ADMIN_USER_PASSWORD, *ADMIN_USER_EMAIL, *ADMIN_USER_PHONE;
 extern int exitFlag, adminPin, is_authenticated, loginAttempts, session, goBack, currentUserID;
 
 #endif // GLOBALS_H

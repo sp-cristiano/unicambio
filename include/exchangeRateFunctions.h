@@ -8,15 +8,14 @@ This file is the header file for the unicambio project.
 [Este arquivo é o arquivo de cabeçalho para o projeto unicambio.]
 *****************************************************************************************
 */
-#ifndef USER_FUNCTIONS
-#define USER_FUNCTIONS
+#ifndef EXCHANGE_RATE_FUNCTIONS_H
+#define EXCHANGE_RATE_FUNCTIONS_H
 
 #include "../include/structures.h"
-
 /*
 ******************************************************************************************
-[Protótipos de funções.]
 ******************************************************************************************
 */
-void createUser(SystemData *sysData, const char *name, const char *username, const char *email, const char *password, const char *phone, int is_active, const time_t created_at, const time_t last_seen, const time_t deleted_at);
-#endif // USER_FUNCTIONS
+// *** PROTOTYPES FOR EXCHANGE RATE FUNCTIONS [PROTÓTIPOS PARA FUNÇÕES DE TAXA DE CÂMBIO] ***
+
+#endif // EXCHANGE_RATE_FUNCTIONS_H

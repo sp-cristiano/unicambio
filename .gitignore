@@ -59,3 +59,4 @@ unicambio.code-workspace
 # CMake files
 CMakeCache.txt
 CMakeFiles/
+.env

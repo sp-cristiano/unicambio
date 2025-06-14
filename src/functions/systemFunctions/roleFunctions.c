@@ -14,6 +14,7 @@ Including internal header files.
 #include "../include/messages.h"
 #include "../include/globals.h"
 #include "../include/structures.h"
+#include "../include/utilities.h"
 #include "../include/roleFunctions.h"
 
 /*
@@ -26,7 +27,7 @@ This function will create roles.
 [Esta função cria papéis.]
 ******************************************************************************
 */
-void createRole(SystemData *sysData, const char *role_name, const char *description, const char *created_at, const char *updated_at, const char *deleted_at)
+void createRole(SystemData *sysData, const char *role_name, const char *description, time_t created_at_date, time_t created_at_time, time_t updated_at_date, time_t updated_at_time, time_t deleted_at_date, time_t deleted_at_time)
 {
 	int roleAlreadyExisted = FALSE;			 // Flag to check if the role already exists [Flag para verificar se o papel já existe]
 	int roleID = sysData->roleCount + 1; // Get the next available role ID [Obter o ID do papel disponível]
@@ -48,15 +49,6 @@ void createRole(SystemData *sysData, const char *role_name, const char *descript
 		sysData->roleCapacity = (sysData->roleCapacity + 2) * 2; // Increase capacity by 2 and double it [Aumentar a capacidade em 2 e dobrá-la]
 	}
 
-	if (sysData->roleCapacity == 0)
-	{
-		sysData->roleCapacity = 2;
-	}
-	else if (sysData->roleCount >= sysData->roleCapacity)
-	{
-		sysData->roleCapacity = (sysData->roleCapacity + 2) * 2; // Increase capacity by 2 and double it [Aumentar a capacidade em 2 e dobrá-la]
-	}
-
 	sysData->roles = realloc(sysData->roles, (sysData->roleCapacity) * sizeof(RoleInfo)); // Increase capacity [Aumentar a capacidade]
 
 	// Check if memory allocation was successful
@@ -66,7 +58,7 @@ void createRole(SystemData *sysData, const char *role_name, const char *descript
 		return;
 	}
 
-	if (role_name == NULL || description == NULL || created_at == NULL || updated_at == NULL)
+	if (role_name == NULL || description == NULL || created_at_date == NULL || created_at_time == NULL || updated_at_date == NULL || updated_at_time == NULL)
 	{
 		printf("%s\n", UI_ERROR_INVALID_INPUT);
 		return;
@@ -88,15 +80,20 @@ void createRole(SystemData *sysData, const char *role_name, const char *descript
 		sysData->roles[sysData->roleCount].role_id = roleID;									// Assign the role ID [Atribuir o ID do papel]
 		sysData->roles[sysData->roleCount].role_name = strdup(role_name);			// Duplicate the role name string [Duplicar a string do nome do papel]
 		sysData->roles[sysData->roleCount].description = strdup(description); // Duplicate the description string [Duplicar a string de descrição]
-		sysData->roles[sysData->roleCount].created_at = strdup(created_at);		// Duplicate the created_at string [Duplicar a string created_at]
-		sysData->roles[sysData->roleCount].updated_at = strdup(updated_at);		// Duplicate the updated_at string [Duplicar a string updated_at]
-		if (deleted_at != NULL)
+		sysData->roles[sysData->roleCount].created_at_date = created_at_date; // Duplicate the created_at string [Duplicar a string created_at]
+		sysData->roles[sysData->roleCount].created_at_time = created_at_time;
+		sysData->roles[sysData->roleCount].updated_at_date = updated_at_date; // Duplicate the updated_at string [Duplicar a string updated_at]
+		sysData->roles[sysData->roleCount].updated_at_time = updated_at_time; // Duplicate the updated_at string [Duplicar a string updated_at]
+
+		if (deleted_at_date != NULL || deleted_at_time != NULL)
 		{
-			sysData->roles[sysData->roleCount].deleted_at = strdup(deleted_at); // Duplicate the deleted_at string if not NULL [Duplicar a string deleted_at se não for NULL]
+			sysData->roles[sysData->roleCount].deleted_at_date = deleted_at_date; // Duplicate the deleted_at string if not NULL [Duplicar a string deleted_at se não for NULL]
+			sysData->roles[sysData->roleCount].deleted_at_time = deleted_at_time; // Duplicate the deleted_at string if not NULL [Duplicar a string deleted_at se não for NULL]
 		}
 		else
 		{
-			sysData->roles[sysData->roleCount].deleted_at = strdup(""); // Set deleted_at to empty string if NULL [Definir deleted_at como string vazia se for NULL]
+			sysData->roles[sysData->roleCount].deleted_at_date = ""; // Set deleted_at to empty string if NULL [Definir deleted_at como string vazia se for NULL]
+			sysData->roles[sysData->roleCount].deleted_at_time = "";
 		}
 		sysData->roleCount++; // Increment the role count [Incrementar o número de papéis]
 
@@ -120,7 +117,7 @@ void saveRoleData(SystemData *sysData)
 		return;
 	}
 
-	FILE *roleFile = fopen("../../DB/roles.txt", "w");
+	FILE *roleFile = fopen(ROLE_FILE, "w");
 	if (roleFile == NULL)
 	{
 		printf("%s\n", UI_ERROR_FILE_WRITE);
@@ -129,7 +126,7 @@ void saveRoleData(SystemData *sysData)
 	}
 	if (sysData->roleCount == 0)
 	{
-		printf("No roles available. [Nenhum papel disponível.]\n");
+		printf("%s\n", UI_ERROR_ROLE_NOT_FOUND);
 		sleep(MID_SLEEP);
 		fclose(roleFile);
 		return; // If there are no roles, exit the function [Se não houver papéis, saia da função]
@@ -138,24 +135,27 @@ void saveRoleData(SystemData *sysData)
 	{
 		for (int i = 0; i < sysData->roleCount; i++)
 		{
-			fprintf(roleFile, "%d|%s|%s|%s|%s|%s\n",
+			fprintf(roleFile, "%d|%s|%s|%s|%s|%s|%s|%s|%s\n",
 							sysData->roles[i].role_id,
 							sysData->roles[i].role_name,
 							sysData->roles[i].description,
-							sysData->roles[i].created_at,
-							sysData->roles[i].updated_at,
-							sysData->roles[i].deleted_at);
+							sysData->roles[i].created_at_date,
+							sysData->roles[i].created_at_time,
+							sysData->roles[i].updated_at_date,
+							sysData->roles[i].updated_at_time,
+							sysData->roles[i].deleted_at_date,
+							sysData->roles[i].deleted_at_time);
 		}
 	}
 	if (fclose(roleFile) != 0)
 	{
-		printf("%s\n", "Failed to close role.txt file after saving. [Falha ao fechar o arquivo role.txt depois de salvar.]");
+		printf("%s\n", UI_ERROR_CLOSING_ROLE_FILE);
 		sleep(MID_SLEEP);
 		return; // If the file cannot be closed, exit the function [Se o arquivo não puder ser fechado, saia da função]
 	}
 	else
 	{
-		printf("Role data saved successfully. [Dados do papel salvos com sucesso.]\n");
+		printf("%s\n", UI_SUCCESSFUL_ROLE_DATA_SAVED);
 		sleep(MID_SLEEP);
 		return; // If the file is saved successfully, exit the function [Se o arquivo for salvo com sucesso, saia da função]
 	}
@@ -176,15 +176,22 @@ void loadRoleData(SystemData *sysData)
 		return;
 	}
 
-	FILE *roleFile = fopen("../../DB/roles.txt", "r");
+	FILE *roleFile = fopen(ROLE_FILE, "r");
 	if (roleFile == NULL)
 	{
-		printf("%s\n", "Failed to open role.txt file. [Falha ao abrir o arquivo role.txt.]");
+		printf("%s\n", UI_ERROR_FILE_READ);
 		sleep(MID_SLEEP);
 		return; // If the file cannot be opened, exit the function [Se o arquivo não puder ser aberto, saia da função]
 	}
-	int roleID;
-	char role_name[MAX_NAME_LENGTH], description[MAX_DESCRIPTION_LENGTH], created_at[MAX_DATE_LENGTH], updated_at[MAX_DATE_LENGTH], deleted_at[MAX_DATE_LENGTH];
+	int _roleID;
+	time_t _created_at_date, _created_at_time, _updated_at_date, _updated_at_time, _deleted_at_date, _deleted_at_time;
+	size_t _roleCount, _roleCapacity;
+
+	char *_role_name = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
+	char *_description = (char *)malloc(MAX_DESCRIPTION_LENGTH * sizeof(char));
+
+	// char role_name[MAX_NAME_LENGTH], description[MAX_DESCRIPTION_LENGTH];
+	// time_t created_at_date, created_at_time, updated_at_date, updated_at_time, deleted_at_date, deleted_at_time;
 
 	if (sysData->roleCapacity == 0)
 	{
@@ -207,17 +214,35 @@ void loadRoleData(SystemData *sysData)
 	sysData->roleCount = 0; // Reset role count before loading [Redefinir o número de papéis antes de carregar]
 
 	// Read the file line by line
-	while (fscanf(roleFile, "%d|%149[^|]|%499[^|]|%99[^|]|%99[^|]|%99[^\n]", &roleID, role_name, description, created_at, updated_at, deleted_at) != EOF && sysData->roleCount < sysData->roleCapacity)
+	while (fscanf(roleFile, "%d|%149[^|]|%499[^|]|%99[^|]|%99[^|]|%99[^\n]|%99[^|]|%99[^|]|%99[^\n]", &_roleID, _role_name, _description, _created_at_date, _created_at_time, _updated_at_date, _updated_at_time, _deleted_at_date, _deleted_at_time) != EOF && sysData->roleCount < sysData->roleCapacity)
 	{
-		sysData->roles[sysData->roleCount].role_id = roleID;
-		sysData->roles[sysData->roleCount].role_name = strdup(role_name);
-		sysData->roles[sysData->roleCount].description = strdup(description);
-		sysData->roles[sysData->roleCount].created_at = strdup(created_at);
-		sysData->roles[sysData->roleCount].updated_at = strdup(updated_at);
-		sysData->roles[sysData->roleCount].deleted_at = strdup(deleted_at);
+		sysData->roles[sysData->roleCount].role_id = _roleID;
+		sysData->roles[sysData->roleCount].role_name = strdup(_role_name);
+		sysData->roles[sysData->roleCount].description = strdup(_description);
+		sysData->roles[sysData->roleCount].created_at_date = _created_at_date;
+		sysData->roles[sysData->roleCount].created_at_time = _created_at_time;
+		sysData->roles[sysData->roleCount].updated_at_date = _updated_at_date;
+		sysData->roles[sysData->roleCount].updated_at_time = _updated_at_time;
+		sysData->roles[sysData->roleCount].deleted_at_date = _deleted_at_date;
+		sysData->roles[sysData->roleCount].deleted_at_time = _deleted_at_time;
 		sysData->roleCount++;
+
+		if (sysData->roleCount >= sysData->roleCapacity)
+		{
+			sysData->roleCapacity = (sysData->roleCapacity + 2) * 2;
+			sysData->roles = realloc(sysData->roles, sysData->roleCapacity * sizeof(RoleInfo));
+
+			if (sysData->roles == NULL)
+			{
+				printf("%s\n", UI_ERROR_MEMORY_ALLOCATION);
+				free(sysData->roles);
+				fclose(roleFile);
+				return;
+			}
+		}
 	}
 	fclose(roleFile);
+	return;
 }
 
 /*
@@ -237,7 +262,7 @@ void showRoles(SystemData *sysData)
 	}
 	if (sysData->roleCount == 0)
 	{
-		printf("No roles available. [Nenhum papel disponível.]\n");
+		printf("%sn", UI_ERROR_NO_ROLES_FOUND);
 		sleep(MID_SLEEP);
 		return; // If there are no roles, exit the function [Se não houver papéis, saia da função]
 	}
@@ -247,7 +272,7 @@ void showRoles(SystemData *sysData)
 		printf("\t********************\n");
 		for (int i = 0; i < sysData->roleCount; i++)
 		{
-			printf("\t%d        %s\n", i + 1, sysData->roles[i].role_id, sysData->roles[i].role_name);
+			printf("\t%d        %s\n", sysData->roles[i].role_id, sysData->roles[i].role_name);
 		}
 	}
 }
@@ -263,7 +288,7 @@ void updateRole(SystemData *sysData, int role_id)
 	int rolePosition, roleFound = FALSE;
 	if (sysData->roleCount == 0)
 	{
-		printf("No roles available to update. [Nenhum papel disponível para atualizar.]\n");
+		printf("%s\n", UI_ERROR_NO_ROLES_FOUND);
 		sleep(MID_SLEEP);
 		return; // If there are no roles, exit the function [Se não houver papéis, saia da função]
 	}
@@ -301,19 +326,25 @@ void updateRole(SystemData *sysData, int role_id)
 			case 1:
 				printf("Enter new role name[Digite o novo nome do papel]: ");
 				scanf("%s", sysData->roles[rolePosition].role_name);
-				sysData->roles[rolePosition].updated_at = getCurrentDateTime(2); // Update the updated_at field
-				saveRoleData(&sysData);																					 // Save the updated role data [Salvar os dados do papel atualizado]
-				showRoles(&sysData);																						 // Show available roles [Mostrar papéis disponíveis]
+				time_t timeStamp = getCurrentDateTime(1), dateStamp  = getCurrentDateTime(0);
+				sysData->roles[rolePosition].updated_at_time = timeStamp; // Update the updated_at field
+				sysData->roles[rolePosition].updated_at_date = dateStamp;
+
+				saveRoleData(&sysData); // Save the updated role data [Salvar os dados do papel atualizado]
+				showRoles(&sysData);		// Show available roles [Mostrar papéis disponíveis]
 				break;
 			case 2:
 				printf("Enter new role description[Digite a nova descrição do papel]: ");
 				scanf("%[^\n]%*c", sysData->roles[rolePosition].description);
-				sysData->roles[rolePosition].updated_at = getCurrentDateTime(2); // Update the updated_at field
-				saveRoleData(&sysData);																					 // Save the updated role data [Salvar os dados do papel atualizado]
-				showRoles(&sysData);																						 // Show available roles [Mostrar papéis disponíveis]
+				time_t timeStamp = getCurrentDateTime(1), dateStamp = getCurrentDateTime(0);
+				sysData->roles[rolePosition].updated_at_time = timeStamp; // Update the updated_at field
+				sysData->roles[rolePosition].updated_at_date = dateStamp;
+
+				saveRoleData(&sysData); // Save the updated role data [Salvar os dados do papel atualizado]
+				showRoles(&sysData);		// Show available roles [Mostrar papéis disponíveis]
 				break;
 			default:
-				printf("Invalid choice. Please try again. [Escolha inválida. Tente novamente.]\n");
+				printf("%s\n", UI_ERROR_INVALID_INPUT);
 				sleep(MID_SLEEP);
 				break;
 			}
@@ -338,7 +369,7 @@ void deleteRole(SystemData *sysData, int role_id)
 	int rolePosition, roleFound = FALSE, reOrderRolePosition;
 	if (sysData->roleCount == 0)
 	{
-		printf("No roles available to delete. [Nenhum papel disponível para excluir.]\n");
+		printf("%s\n", UI_ERROR_NO_ROLES_FOUND);
 		sleep(MID_SLEEP);
 		return; // If there are no roles, exit the function [Se não houver papéis, saia da função]
 	}
@@ -354,7 +385,10 @@ void deleteRole(SystemData *sysData, int role_id)
 
 	if (roleFound == TRUE)
 	{
-		sysData->roles[rolePosition].deleted_at = getCurrentDateTime(2); // Set the deleted_at field to current date and time
+		time_t timeStamp = getCurrentDateTime(1), dateStamp = getCurrentDateTime(0);
+		sysData->roles[rolePosition].deleted_at_date = dateStamp; // Set the deleted_at field to current date and time
+		sysData->roles[rolePosition].deleted_at_time = timeStamp;
+
 		for (reOrderRolePosition = rolePosition; reOrderRolePosition < sysData->roleCount - 1; reOrderRolePosition++)
 		{
 			sysData->roles[reOrderRolePosition] = sysData->roles[reOrderRolePosition + 1]; // Shift roles to the left [Deslocar papéis para a esquerda]

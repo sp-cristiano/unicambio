@@ -17,6 +17,38 @@ Including internal header files.
 #include "../include/structures.h"
 #include "../include/oauthFunctions.h"
 
+char *hashPassword(const char *password)
+{
+	// Hash the password using a secure hashing algorithm [Hashear a senha usando um algoritmo de hash seguro]
+
+	char *hashStr = malloc(crypto_pwhash_STRBYTES);
+
+	if (hashStr == NULL)
+	{
+		printf("%s\n", UI_ERROR_MEMORY_ALLOCATION);
+		return NULL;
+	}
+
+	if (crypto_pwhash_str(hashStr, password, strlen(password), crypto_pwhash_OPSLIMIT_INTERACTIVE, crypto_pwhash_MEMLIMIT_INTERACTIVE) != 0)
+	{
+		printf("%s\n", UI_ERROR_HASHING_PASSWORD);
+		return NULL;
+	}
+	return hashStr;
+}
+
+// Verify the password against the hashed password
+int verifyPassword(const char *password, const char *hashedPassword)
+{
+
+	if (crypto_pwhash_str_verify(hashedPassword, password, strlen(password)) == 0)
+	{
+		return TRUE; // If verification succeeds, return TRUE [Se a verificação for bem-sucedida, retornar TRUE]
+	}
+	// printf("%s\n", UI_ERROR_INVALID_PASSWORD);
+	return FALSE; // If verification fails, return FALSE [Se a verificação falhar, retornar FALSE]
+}
+
 /*
 ******************************************************************************
 This function will display the login page.
@@ -104,7 +136,8 @@ void loginPage(SystemData *sysData)
 
 int authenticateUser(SystemData *sysData, const char *username, const char *password)
 {
-	char temp_username[MAX_NAME_LENGTH], temp_password[MAX_NAME_LENGTH];
+	char temp_username[MAX_NAME_LENGTH], temp_password[MAX_PASSWORD_LENGTH];
+	int passwordIsVerified = FALSE;
 
 	// Check if the system data is initialized [Verifique se os dados do sistema estão inicializados]
 	if (sysData == NULL || sysData->users == NULL)
@@ -118,13 +151,14 @@ int authenticateUser(SystemData *sysData, const char *username, const char *pass
 	{
 		strcpy(temp_username, sysData->users[i].username);
 		strcpy(temp_password, sysData->users[i].password);
+		passwordIsVerified = verifyPassword(password, temp_password);
 
 		// Compare the input username and password with the stored username and password [Comparar o nome de usuário e a senha inseridos com o nome de usuário e a senha armazenados]
 		if (strcmp(temp_username, username) == 0)
 		{
-			if (strcmp(temp_password, password) == 0)
+			// if (strcmp(temp_password, password) == 0)
+			if (passwordIsVerified == TRUE)
 			{
-				is_authenticated = TRUE;
 				session = TRUE;																						// Set the session flag to TRUE [Definir a flag de sessão como TRUE]
 				currentUserID = sysData->users[i].user_id;								// Set the current user ID [Definir o ID do usuário atual]
 				currentUserName = sysData->users[i].username;							// Set the current user name [Definir o nome do usuário atual]
@@ -143,13 +177,14 @@ int authenticateUser(SystemData *sysData, const char *username, const char *pass
 				return is_authenticated;	// Return FALSE if the password is incorrect [Retornar FALSE se a senha estiver incorreta]
 			}
 		}
-		else if (strcmp(temp_password, password) == 0)
-		{
-			printf("\n   %s\n", UI_ERROR_INVALID_USERNAME);
-			sleep(MID_SLEEP);
-			is_authenticated = FALSE; // Set the authentication flag to FALSE if the username is incorrect [Definir a flag de autenticação como FALSE se o nome de usuário estiver incorreto]
-			return is_authenticated;	// Return FALSE if the username is incorrect [Retornar FALSE se o nome de usuário estiver incorreto]
-		}
+		// else if (strcmp(temp_password, password) == 0)
+		else if (passwordIsVerified == TRUE)
+			{
+				printf("\n   %s\n", UI_ERROR_INVALID_USERNAME);
+				sleep(MID_SLEEP);
+				is_authenticated = FALSE; // Set the authentication flag to FALSE if the username is incorrect [Definir a flag de autenticação como FALSE se o nome de usuário estiver incorreto]
+				return is_authenticated;	// Return FALSE if the username is incorrect [Retornar FALSE se o nome de usuário estiver incorreto]
+			}
 		else
 		{
 			printf("\n   %s\n", UI_ERROR_INVALID_CREDENTIALS); // Invalid username or password [Nome de usuário ou senha inválidos]
@@ -188,3 +223,4 @@ void grantLoginAccess(SystemData *sysData, int currentUserID)
 		sleep(MIN_SLEEP);
 		return;
 	}
+}

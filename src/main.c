@@ -13,7 +13,11 @@ Including internal header files.
 */
 #include "../include/config.h"
 #include "../include/structures.h"
-
+#include "../include/initSystem.h"
+#include "../include/initDefaultSetup.h"
+#include "../include/adminMenu.h"
+#include "../include/systemFunctions.h"
+#include "../include/utilities.h"
 
 int main()
 {
@@ -29,16 +33,16 @@ int main()
 	initDefaultSetup(&sysData);
 
 	// TODO: Load system data from file [Carregar dados do sistema do arquivo]
-	// loadSystemData(&sysData);
+	loadSystemData(&sysData);
 
 	// Clear the screen [Limpar a tela]
 	startSessionMenu(&sysData);
 
 	// TODO: Save system data to file [Salvar dados do sistema no arquivo]
-	// saveSystemData(&sysData);
+	saveSystemData(&sysData);
 
-	// Free allocated memory [Liberar memória alocada]
-	// freeSystemData(&sysData);
+	// TODO: Free allocated memory [Liberar memória alocada]
+	freeSystemData(&sysData);
 
 	return 0;
 }
