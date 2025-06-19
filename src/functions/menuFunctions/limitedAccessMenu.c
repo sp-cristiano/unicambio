@@ -9,10 +9,10 @@
  *
  */
 
-#include "unicambio.h"
-#include "structures.h"
-#include "menuFunctions.h"
-#include "logger.h"
+#include "../include/unicambio.h"
+#include "../include/structures.h"
+#include "../include/limitedAccessMenu.h"
+#include "../include/logger.h"
 
 // void limitedAccessMenu(SystemData *sysData)
 // {

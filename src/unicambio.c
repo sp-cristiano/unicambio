@@ -34,16 +34,19 @@
 //  * @return int 0 on successful execution, 1 on memory allocation failure.
 //  *             [0 em caso de execução bem-sucedida, 1 em falha de alocação de memória.]
 //  */
-#include "unicambio.h"
-#include "structures.h"
-#include "initSystem.h"
-#include "messages.h"
-#include "createDB.h"
-#include "logger.h"
-#include "env.h"
-#include "utilities.h"
-#include "oauth.h"
-#include "homePageMenu.h"
+#include "../include/unicambio.h"
+#include "../include/structures.h"
+#include "../include/initSystem.h"
+#include "../include/messages.h"
+#include "../include/createDB.h"
+#include "../include/logger.h"
+#include "../include/env.h"
+#include "../include/utilities.h"
+#include "../include/oauth.h"
+#include "../include/initDefaultSetup.h"
+#include "../include/homePageMenu.h"
+#include "../include/saveSystemData.h"
+#include "../include/loadSystemData.h"
 int main()
 {
 	// Set the location of the application [Defina a localização da aplicação]

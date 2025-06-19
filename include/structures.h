@@ -164,7 +164,8 @@ typedef struct
  */
 typedef struct
 {
-	int transactionID;	///< Unique transaction ID [ID exclusivo da transação]
+	int transactionID; ///< Unique transaction ID [ID exclusivo da transação]
+	int exchangeRateID;	///< Exchange rate associated with the transaction [Câmbio associado à transação]
 	int userID;					///< User associated with the transaction [Usuário associado à transação]
 	int fromCurrencyID; ///< Currency being exchanged from [Moeda sendo trocada de]
 	double fromCurrencyAmount;

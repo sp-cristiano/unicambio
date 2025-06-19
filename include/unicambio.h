@@ -98,8 +98,8 @@
  * @brief Default currency rate [Taxa de câmbio padrão]
  *
  */
-#define DEFAULT_1_AOA_TO_1_USD_CURRENCY_RATE 1 / 939.316
-#define DEFAULT_1_AOA_TO_1_AOA_CURRENCY_RATE 1.00
+#define DEFAULT_AOA_TO_1_USD_CURRENCY_RATE 939.316
+#define DEFAULT_AOA_TO_1_AOA_CURRENCY_RATE 1.00
 
 /**
  * @brief Default Currency Country

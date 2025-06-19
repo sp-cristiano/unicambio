@@ -1,10 +1,10 @@
-#include "unicambio.h"
-#include "adminFunctions.h"
-#include "structures.h"
-#include "messages.h"
-#include "logger.h"
-#include "utilities.h"
-#include "oauth.h"
+#include "../include/unicambio.h"
+#include "../include/userFunctions.h"
+#include "../include/structures.h"
+#include "../include/messages.h"
+#include "../include/logger.h"
+#include "../include/utilities.h"
+#include "../include/oauth.h"
 
 void createUser(SystemData *sysData, char *name, char *userName, char *email, char *password, char *phone, int roleID, int userStatus, char *createAt, char *lastSeen, char *deleteAt)
 {
@@ -155,7 +155,7 @@ void createUser(SystemData *sysData, char *name, char *userName, char *email, ch
 		if (deleteAt == NULL)
 		{
 			deleteAt = " ";
-			sysData->users[sysData->userCount].deleteAt = strdup(" ");
+			sysData->users[sysData->userCount].deleteAt = strdup(deleteAt);
 			if (sysData->users[sysData->userCount].deleteAt == NULL)
 			{
 				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
@@ -225,6 +225,7 @@ void saveUserData(SystemData *sysData)
 		fprintf(usersFile, "%d|%s|%s|%s|%s|%s|%d|%d|%s|%s|%s\n", sysData->users[i].userID, sysData->users[i].name, sysData->users[i].userName, sysData->users[i].email, sysData->users[i].password, sysData->users[i].phone, sysData->users[i].roleID, sysData->users[i].userStatus, sysData->users[i].createAt, sysData->users[i].lastSeen, sysData->users[i].deleteAt);
 	}
 	fclose(usersFile);
+	return;
 }
 // Load User Data to The structured User Database from the database file. [Carregue os dados de usuários estruturados no banco de dados do arquivo de banco de dados.]
 void loadUserData(SystemData *sysData)
@@ -247,7 +248,7 @@ void loadUserData(SystemData *sysData)
 	}
 	// initialize variables for reading data
 	int _userID, _roleID, _userStatus;
-	char _name[MAX_NAME_LENGTH], *_userName[MAX_NAME_LENGTH], _email[MAX_NAME_LENGTH], _password[MAX_PASSWORD_LENGTH], _phone[MAX_NAME_LENGTH], *_createAt[MAX_DATE_LENGTH], _lastSeen[MAX_DATE_LENGTH], _deleteAt[MAX_DATE_LENGTH];
+	char _name[MAX_NAME_LENGTH], *_userName[MAX_NAME_LENGTH], _email[MAX_NAME_LENGTH], _password[MAX_PASSWORD_LENGTH], _phone[MAX_NAME_LENGTH], *_createAt[MAX_DATE_LENGTH], _lastSeen[MAX_DATE_LENGTH], _deletedAt[MAX_DATE_LENGTH];
 
 	// adjust user capacity if needed.
 	if (sysData->userCapacity == 0)
@@ -276,7 +277,7 @@ void loadUserData(SystemData *sysData)
 
 	// Read data from file [Leia dados do arquivo]
 
-	while (fscanf(usersFile, "%d|%149[^|]|%149[^|]|%149[^|]|%299[^|]|%149[^|]|%d|%d|%99[^|]|%99[^|]|%99[^|]\n", &_userID, &_name, &_userName, &_email, &_password, &_phone, &_roleID, &_userStatus, &_createAt, &_lastSeen, &_deleteAt) != EOF && sysData->userCount < sysData->userCapacity)
+	while (fscanf(usersFile, "%d|%149[^|]|%149[^|]|%149[^|]|%299[^|]|%149[^|]|%d|%d|%99[^|]|%99[^|]|%99[^|]\n", &_userID, &_name, &_userName, &_email, &_password, &_phone, &_roleID, &_userStatus, &_createAt, &_lastSeen, &_deletedAt) != EOF && sysData->userCount < sysData->userCapacity)
 	{
 		// Check if userCount exceeds userCapacity
 		if (sysData->userCount >= sysData->userCapacity)
@@ -377,19 +378,46 @@ void loadUserData(SystemData *sysData)
 			sleep(MID_SLEEP);
 			return;
 		}
-		sysData->users[sysData->userCount].deleteAt = strdup(_deleteAt);
+
+		sysData->users[sysData->userCount].deleteAt = strdup(_deletedAt);
+
 		if (sysData->users[sysData->userCount].deleteAt == NULL)
 		{
-			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			free(sysData->users[sysData->userCount].name);
-			free(sysData->users[sysData->userCount].userName);
-			free(sysData->users[sysData->userCount].email);
-			free(sysData->users[sysData->userCount].password);
-			free(sysData->users[sysData->userCount].phone);
-			free(sysData->users[sysData->userCount].createAt);
-			free(sysData->users[sysData->userCount].lastSeen);
-			sleep(MID_SLEEP);
+			strcpy(_deletedAt, " ");
+
+			sysData->users[sysData->userCount].deleteAt = strdup(_deletedAt);
+
+			if (sysData->users[sysData->userCount].deleteAt == NULL)
+			{
+				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				free(sysData->users[sysData->userCount].name);
+				free(sysData->users[sysData->userCount].userName);
+				free(sysData->users[sysData->userCount].email);
+				free(sysData->users[sysData->userCount].password);
+				free(sysData->users[sysData->userCount].phone);
+				free(sysData->users[sysData->userCount].createAt);
+				free(sysData->users[sysData->userCount].lastSeen);
+				sleep(MID_SLEEP);
+			}
+		}
+		else
+		{
+			sysData->users[sysData->userCount].deleteAt = strdup(_deletedAt);
+			if (sysData->users[sysData->userCount].deleteAt == NULL)
+			{
+				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				free(sysData->users[sysData->userCount].name);
+				free(sysData->users[sysData->userCount].userName);
+				free(sysData->users[sysData->userCount].email);
+				free(sysData->users[sysData->userCount].password);
+				free(sysData->users[sysData->userCount].phone);
+				free(sysData->users[sysData->userCount].createAt);
+				free(sysData->users[sysData->userCount].lastSeen);
+				sleep(MID_SLEEP);
+				return;
+			}
 		}
 		sysData->userCount++;
 	}
@@ -424,6 +452,13 @@ void loadUserData(SystemData *sysData)
 // Free User Data
 void freeUserData(SystemData *sysData)
 {
+	if (sysData == NULL)
+	{
+		logMessages(LOG_ERROR, UI_ERROR_SYSTEM_DATA_IS_NULL);
+		centerStringOnly(UI_ERROR_SYSTEM_DATA_IS_NULL);
+		sleep(MID_SLEEP);
+		return;
+	}
 	for (size_t i = 0; i < sysData->userCount; i++)
 	{
 		free(sysData->users[i].name);

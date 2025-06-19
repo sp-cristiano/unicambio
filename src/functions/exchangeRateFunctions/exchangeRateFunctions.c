@@ -1,9 +1,9 @@
-#include "unicambio.h"
-#include "exchangeRateFunctions.h"
-#include "structures.h"
-#include "messages.h"
-#include "logger.h"
-#include "utilities.h"
+#include "../include/unicambio.h"
+#include "../include/utilities.h"
+#include "../include/exchangeRateFunctions.h"
+#include "../include/structures.h"
+#include "../include/messages.h"
+#include "../include/logger.h"
 
 void createExchangeRate(SystemData *sysData, int fromCurrencyID, double fromCurrencyAmountToConvert, int exchangeRateStatus, int toCurrencyID, char *createdAt, char *updatedAt, char *deletedAt)
 {
@@ -46,9 +46,10 @@ void createExchangeRate(SystemData *sysData, int fromCurrencyID, double fromCurr
 			sleep(MID_SLEEP);
 			return;
 		}
+
 		sysData->exchangeRates = tempExchangeRateSize;
 
-		int exchangeRateID = randomNumber(60000, 80000), transactionID = randomNumber(80010, 99090);
+		int exchangeRateID = randomNumber(60000, 80000);
 
 		// check if exchangeRateID already exists [Verifique se o ID da taxa de câmbio já existe]
 		for (size_t i = 0; i < sysData->exchangeRateCount; i++)
@@ -59,9 +60,11 @@ void createExchangeRate(SystemData *sysData, int fromCurrencyID, double fromCurr
 				i = -1;
 			}
 		}
+		// set current user id from appContext
+		int userID = sysData->appContext->currentUserID;
 
 		// Get from currency Rate by from currency id
-		double fromCurrencyRate = getCurrencyRateByID(sysData, fromCurrencyID);
+		double fromCurrencyRate = getCurrencyRateToOneKzByID(sysData, fromCurrencyID);
 
 		// Convert from currency to Kz
 		double fromCurrencyRateToKz = ((fromCurrencyAmountToConvert) / (fromCurrencyRate));
@@ -70,7 +73,7 @@ void createExchangeRate(SystemData *sysData, int fromCurrencyID, double fromCurr
 		char *fromCurrencyCode = getCurrencyCodeByID(sysData, fromCurrencyID);
 
 		// Get to currency Rate by to currency id
-		double toCurrencyRate = getCurrencyRateByID(sysData, toCurrencyID);
+		double toCurrencyRate = getCurrencyRateToneKzByID(sysData, toCurrencyID);
 
 		// Convert from currency amount that has been converted to kwanza to to currency amount in to currency currency
 		double toCurrencyAmountConvertedTo = fromCurrencyRateToKz * toCurrencyRate;
@@ -134,58 +137,13 @@ void createExchangeRate(SystemData *sysData, int fromCurrencyID, double fromCurr
 				return;
 			}
 		}
+		// revert exchange rate from one kz
+		double exchangeRate = revertRateFromOneKz(toCurrencyRateToKz);
 
-		// ADD TRANSACTION TO TRANSACTION INFO HISTORY
-		int transactionStatus = active;
+		createTransaction(sysData, exchangeRateID, userID, fromCurrencyID, fromCurrencyAmountToConvert, toCurrencyID, toCurrencyAmountConvertedTo, exchangeRateStatus, fromCurrencyCode, fromCurrencyRateToKz, toCurrencyCode, toCurrencyAmountConvertedTo, exchangeRate, createdAt, updatedAt, deletedAt);
 
-		// Check if transaction capacity need adjustment [Verifique se a capacidade de transação precisa de ajuste]
-		if (sysData->transactionCapacity == 0)
-		{
-			sysData->transactionCapacity = 2;
-		}
-		else if (sysData->transactionCount >= sysData->transactionCapacity)
-		{
-			sysData->transactionCapacity = (sysData->transactionCapacity + 2) * 2;
-		}
-
-		// Reallocate Memory to the transaction structure.
-		TransactionInfo *tempTransactionSize = realloc(sysData->transactions, sizeof(TransactionInfo) * sysData->transactionCapacity);
-		if (tempTransactionSize == NULL)
-		{
-			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			sleep(MID_SLEEP);
-			return;
-		}
-		sysData->transactions = tempTransactionSize;
-
-		// Check if transactionID already exists [Verifique se o ID da transação já existe]
-		for (size_t i = 0; i < sysData->transactionCount; i++)
-		{
-			if (sysData->transactions[i].transactionID == transactionID)
-			{
-				transactionID = randomNumber(80010, 99090);
-				i = -1;
-			}
-		}
-		// Allocate memory for transaction history and copy strings for new transaction history
-		sysData->transactions[sysData->transactionCount].transactionID = transactionID;
-		sysData->transactions[sysData->transactionCount].userID = sysData->appContext->currentUserID;
-		sysData->transactions[sysData->transactionCount].fromCurrencyID = fromCurrencyID;
-		sysData->transactions[sysData->transactionCount].fromCurrencyAmount = fromCurrencyAmountToConvert;
-		sysData->transactions[sysData->transactionCount].toCurrencyID = toCurrencyID;
-		sysData->transactions[sysData->transactionCount].toCurrencyAmount = toCurrencyAmountConvertedTo;
-		sysData->transactions[sysData->transactionCount].exchangeRate = toCurrencyRate;
-		sysData->transactions[sysData->transactionCount].transactionStatus = transactionStatus;
-
-		sysData->transactions[sysData->transactionCount].createdAt = sysData->exchangeRates[sysData->exchangeRateCount].createdAt;
-		sysData->transactions[sysData->transactionCount].updatedAt = sysData->exchangeRates[sysData->exchangeRateCount].updatedAt;
-		sysData->transactions[sysData->transactionCount].deletedAt = sysData->exchangeRates[sysData->exchangeRateCount].deletedAt;
-
-		sysData->transactionCount++;
 		sysData->exchangeRateCount++;
 		saveExchangeRateData(sysData);
-		saveTransactionData(sysData);
 	}
 	else
 	{
@@ -195,4 +153,180 @@ void createExchangeRate(SystemData *sysData, int fromCurrencyID, double fromCurr
 		return;
 	}
 	return;
+}
+
+// Save Exchange Rate Data to file
+void saveExchangeRateData(SystemData *sysData)
+{
+	if (sysData == NULL)
+	{
+		logMessages(LOG_ERROR, UI_ERROR_SYSTEM_DATA_IS_NULL);
+		centerStringOnly(UI_ERROR_SYSTEM_DATA_IS_NULL);
+		sleep(MID_SLEEP);
+		return;
+	}
+
+	FILE *exchangeRateFile = fopen(EXCHANGE_RATE_DATA_FILE_PATH, "w");
+	if (exchangeRateFile == NULL)
+	{
+		logMessages(LOG_ERROR, UI_ERROR_EXCHANGE_RATE_DATA_FILE_NOT_FOUND);
+		centerStringOnly(UI_ERROR_EXCHANGE_RATE_DATA_FILE_NOT_FOUND);
+		sleep(MID_SLEEP);
+		return;
+	}
+
+	for (size_t i = 0; i < sysData->exchangeRateCount; i++)
+	{
+		fprintf(exchangeRateFile, "%d|%d|%lf|%lf|%d|%d|%lf|%lf|%s|%s|%s\n", sysData->exchangeRates[i].exchangeRateID, sysData->exchangeRates[i].fromCurrencyID, sysData->exchangeRates[i].fromCurrencyAmountToConvert, sysData->exchangeRates[i].fromCurrencyRateToKz, sysData->exchangeRates[i].toCurrencyID, sysData->exchangeRates[i].exchangeRateStatus, sysData->exchangeRates[i].toCurrencyAmountConvertedTo, sysData->exchangeRates[i].toCurrencyRateToKz, sysData->exchangeRates[i].createdAt, sysData->exchangeRates[i].updatedAt, sysData->exchangeRates[i].deletedAt);
+	}
+	fclose(exchangeRateFile);
+	return;
+}
+
+void loadExchangeRateData(SystemData *sysData)
+{
+	if (sysData == NULL)
+	{
+		logMessages(LOG_ERROR, UI_ERROR_SYSTEM_DATA_IS_NULL);
+		centerStringOnly(UI_ERROR_SYSTEM_DATA_IS_NULL);
+		sleep(MID_SLEEP);
+		return;
+	}
+
+	FILE *exchangeRateFile = fopen(EXCHANGE_RATE_DATA_FILE_PATH, "r");
+	if (exchangeRateFile == NULL)
+	{
+		logMessages(LOG_ERROR, UI_ERROR_EXCHANGE_RATE_DATA_FILE_NOT_FOUND);
+		centerStringOnly(UI_ERROR_EXCHANGE_RATE_DATA_FILE_NOT_FOUND);
+		sleep(MID_SLEEP);
+		return;
+	}
+
+	// Initialize variables for reading data
+	int _exchangeRateID, _fromCurrencyID, toCurrencyID, _exchangeRateStatus;
+	double _fromCurrencyAmountToConvert, _fromCurrencyRateToKz, _toCurrencyAmountConvertedTo, _toCurrencyRateToKz;
+	char _createdAt[MAX_DATE_LENGTH], _updatedAt[MAX_DATE_LENGTH], _deletedAt[MAX_DATE_LENGTH];
+
+	// Adjusting exchange capacity if needed.
+	if (sysData->exchangeRateCapacity == 0)
+	{
+		sysData->exchangeRateCapacity = 2;
+	}
+	else if (sysData->exchangeRateCount >= sysData->exchangeRateCapacity)
+	{
+		sysData->exchangeRateCapacity = (sysData->exchangeRateCapacity + 2) * 2;
+	}
+
+	// Reallocate memory to exchange rate structure
+	ExchangeRateInfo *tempExchangeRateSize = realloc(sysData->exchangeRates, sizeof(ExchangeRateInfo) * sysData->exchangeRateCapacity);
+	if (tempExchangeRateSize == NULL)
+	{
+		logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+		centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+		sleep(MID_SLEEP);
+		return;
+	}
+	sysData->exchangeRates = tempExchangeRateSize;
+
+	// initializing sysData->exchangeRateCount to 0
+	sysData->exchangeRateCount = 0;
+
+	while (fscanf(exchangeRateFile, "%d|%d|%lf|%lf|%d|%d|%lf|%lf|%99[^|]|%99[^|]|%99[^|]\n)", &_exchangeRateID, &_fromCurrencyID, &_fromCurrencyAmountToConvert, &_fromCurrencyRateToKz, &toCurrencyID, &_exchangeRateStatus, &_toCurrencyAmountConvertedTo, &_toCurrencyRateToKz, _createdAt, _updatedAt, _deletedAt) != EOF && sysData->exchangeRateCount < sysData->exchangeRateCapacity)
+	{
+		// Check if exchangeCount exceeds exchangecapacity [Verifique se exchangeCount excede exchangecapacity]
+		if (sysData->exchangeRateCount >= sysData->exchangeRateCapacity)
+		{
+			sysData->exchangeRateCapacity = (sysData->exchangeRateCapacity + 2) * 2;
+			tempExchangeRateSize = realloc(sysData->exchangeRates, sizeof(ExchangeRateInfo) * sysData->exchangeRateCapacity);
+			if (tempExchangeRateSize == NULL)
+			{
+				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				sleep(MID_SLEEP);
+				return;
+			}
+			sysData->exchangeRates = tempExchangeRateSize;
+		}
+
+		// Add exchange rate data to database
+		sysData->exchangeRates[sysData->exchangeRateCount].exchangeRateID = _exchangeRateID;
+		sysData->exchangeRates[sysData->exchangeRateCount].fromCurrencyID = _fromCurrencyID;
+		sysData->exchangeRates[sysData->exchangeRateCount].fromCurrencyAmountToConvert = _fromCurrencyAmountToConvert;
+		sysData->exchangeRates[sysData->exchangeRateCount].fromCurrencyRateToKz = _fromCurrencyRateToKz;
+		sysData->exchangeRates[sysData->exchangeRateCount].toCurrencyID = toCurrencyID;
+		sysData->exchangeRates[sysData->exchangeRateCount].exchangeRateStatus = _exchangeRateStatus;
+		sysData->exchangeRates[sysData->exchangeRateCount].toCurrencyAmountConvertedTo = _toCurrencyAmountConvertedTo;
+		sysData->exchangeRates[sysData->exchangeRateCount].toCurrencyRateToKz = _toCurrencyRateToKz;
+		sysData->exchangeRates[sysData->exchangeRateCount].createdAt = strdup(_createdAt);
+		if (sysData->exchangeRates[sysData->exchangeRateCount].createdAt == NULL)
+		{
+			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			sleep(MID_SLEEP);
+			return;
+		}
+		sysData->exchangeRates[sysData->exchangeRateCount].updatedAt = strdup(_updatedAt);
+		if (sysData->exchangeRates[sysData->exchangeRateCount].updatedAt == NULL)
+		{
+			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			free(sysData->exchangeRates[sysData->exchangeRateCount].createdAt);
+			sleep(MID_SLEEP);
+			return;
+		}
+
+		sysData->exchangeRates[sysData->exchangeRateCount].deletedAt = strdup(_deletedAt);
+
+		if (sysData->exchangeRates[sysData->exchangeRateCount].deletedAt == NULL)
+		{
+			strcpy(_deletedAt, " ");
+			sysData->exchangeRates[sysData->exchangeRateCount].deletedAt = strdup(_deletedAt);
+			if (sysData->exchangeRates[sysData->exchangeRateCount].deletedAt == NULL)
+			{
+
+				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				free(sysData->exchangeRates[sysData->exchangeRateCount].createdAt);
+				free(sysData->exchangeRates[sysData->exchangeRateCount].updatedAt);
+				sleep(MID_SLEEP);
+				return;
+			}
+		}
+		else
+		{
+			sysData->exchangeRates[sysData->exchangeRateCount].deletedAt = strdup(_deletedAt);
+			if (sysData->exchangeRates[sysData->exchangeRateCount].deletedAt == NULL)
+			{
+
+				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				free(sysData->exchangeRates[sysData->exchangeRateCount].createdAt);
+				free(sysData->exchangeRates[sysData->exchangeRateCount].updatedAt);
+				sleep(MID_SLEEP);
+				return;
+			}
+		}
+
+		sysData->exchangeRateCount++;
+	}
+	fclose(exchangeRateFile);
+}
+
+// Free exchangeRate Data
+void freeExchangeRateData(SystemData *sysData)
+{
+	if (sysData == NULL)
+	{
+		logMessages(LOG_ERROR, UI_ERROR_SYSTEM_DATA_IS_NULL);
+		centerStringOnly(UI_ERROR_SYSTEM_DATA_IS_NULL);
+		sleep(MID_SLEEP);
+		return;
+	}
+	for (size_t i = 0; i < sysData->exchangeRateCount; i++)
+	{
+		free(sysData->exchangeRates[i].createdAt);
+		free(sysData->exchangeRates[i].updatedAt);
+		free(sysData->exchangeRates[i].deletedAt);
+	}
+	free(sysData->exchangeRates);
 }

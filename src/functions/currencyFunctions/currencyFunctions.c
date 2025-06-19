@@ -1,9 +1,9 @@
-#include "unicambio.h"
-#include "currencyFunctions.h"
-#include "structures.h"
-#include "messages.h"
-#include "logger.h"
-#include "utilities.h"
+#include "../include/unicambio.h"
+#include "../include/currencyFunctions.h"
+#include "../include/structures.h"
+#include "../include/messages.h"
+#include "../include/logger.h"
+#include "../include/utilities.h"
 
 void createCurrency(SystemData *sysData, char *name, char *abbreviation, char *code, char *symbol, char *country, int currencyStatus, double rateToOneKz, char *createdAt, char *updatedAt, char *deletedAt)
 {
@@ -148,7 +148,8 @@ void createCurrency(SystemData *sysData, char *name, char *abbreviation, char *c
 		}
 		if (deletedAt == NULL)
 		{
-			sysData->currencies[sysData->currencyCount].deletedAt = strdup(" ");
+			deletedAt = " ";
+			sysData->currencies[sysData->currencyCount].deletedAt = strdup(deletedAt);
 			if (sysData->currencies[sysData->currencyCount].deletedAt == NULL)
 			{
 				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
@@ -214,7 +215,7 @@ void saveCurrencyData(SystemData *sysData)
 	}
 	for (size_t i = 0; i < sysData->currencyCount; i++)
 	{
-		fprintf(currencyFile, "%d|%s|%s|%s|%s|%s|%d|%lf|%s|%s|%s", sysData->currencies[i].currencyID, sysData->currencies[i].name, sysData->currencies[i].abbreviation, sysData->currencies[i].code, sysData->currencies[i].symbol, sysData->currencies[i].country, sysData->currencies[i].currencyStatus, sysData->currencies[i].rateToOneKz, sysData->currencies[i].createdAt, sysData->currencies[i].updatedAt, sysData->currencies[i].deletedAt);
+		fprintf(currencyFile, "%d|%s|%s|%s|%s|%s|%d|%lf|%s|%s|%s\n", sysData->currencies[i].currencyID, sysData->currencies[i].name, sysData->currencies[i].abbreviation, sysData->currencies[i].code, sysData->currencies[i].symbol, sysData->currencies[i].country, sysData->currencies[i].currencyStatus, sysData->currencies[i].rateToOneKz, sysData->currencies[i].createdAt, sysData->currencies[i].updatedAt, sysData->currencies[i].deletedAt);
 	}
 	fclose(currencyFile);
 	return;
@@ -242,7 +243,7 @@ void loadCurrencyData(SystemData *sysData)
 	// initialize variables for reading data
 	int _currencyID, _currencyStatus;
 	double _rateToOneKz;
-	char _name[MAX_NAME_LENGTH], _abbreviation[MAX_NAME_LENGTH], _code[MAX_NAME_LENGTH], _symbol[MAX_NAME_LENGTH], _country[MAX_NAME_LENGTH], *_createdAt[MAX_DATE_LENGTH], _updatedAt[MAX_DATE_LENGTH], *_deletedAt[MAX_DATE_LENGTH];
+	char _name[MAX_NAME_LENGTH], _abbreviation[MAX_NAME_LENGTH], _code[MAX_NAME_LENGTH], _symbol[MAX_NAME_LENGTH], _country[MAX_NAME_LENGTH], _createdAt[MAX_DATE_LENGTH], _updatedAt[MAX_DATE_LENGTH], _deletedAt[MAX_DATE_LENGTH];
 
 	// adjust currency capacity if needed.
 	if (sysData->currencyCapacity == 0)
@@ -268,7 +269,7 @@ void loadCurrencyData(SystemData *sysData)
 	// Initializing sysData->currencyCount to 0
 	sysData->currencyCount = 0;
 
-	while (fscanf(currencyFile, "%d|%149[^|]|%149[^|]|%149[^|]|%149[^|]|%149[^|]|%d|%lf|%99[^|]|%99[^|]|%99[^|]\n", &_currencyID, _name, _abbreviation, _code, _symbol, _country, &_currencyStatus, _createdAt, _rateToOneKz, _updatedAt, _deletedAt) != EOF && sysData->currencyCount < sysData->currencyCapacity)
+	while (fscanf(currencyFile, "%d|%149[^|]|%149[^|]|%149[^|]|%149[^|]|%149[^|]|%d|%lf|%99[^|]|%99[^|]|%99[^|]\n", &_currencyID, _name, _abbreviation, _code, _symbol, _country, &_currencyStatus, _rateToOneKz, _createdAt, _updatedAt, _deletedAt) != EOF && sysData->currencyCount < sysData->currencyCapacity)
 	{
 		if (sysData->currencyCount >= sysData->currencyCapacity)
 		{
@@ -377,17 +378,40 @@ void loadCurrencyData(SystemData *sysData)
 		sysData->currencies[sysData->currencyCount].deletedAt = strdup(_deletedAt);
 		if (sysData->currencies[sysData->currencyCount].deletedAt == NULL)
 		{
-			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			free(sysData->currencies[sysData->currencyCount].name);
-			free(sysData->currencies[sysData->currencyCount].abbreviation);
-			free(sysData->currencies[sysData->currencyCount].code);
-			free(sysData->currencies[sysData->currencyCount].symbol);
-			free(sysData->currencies[sysData->currencyCount].country);
-			free(sysData->currencies[sysData->currencyCount].createdAt);
-			free(sysData->currencies[sysData->currencyCount].updatedAt);
-			sleep(MID_SLEEP);
-			return;
+			strcpy(_deletedAt, " ");
+			sysData->currencies[sysData->currencyCount].deletedAt = strdup(_deletedAt);
+			if (sysData->currencies[sysData->currencyCount].deletedAt == NULL)
+			{
+				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				free(sysData->currencies[sysData->currencyCount].name);
+				free(sysData->currencies[sysData->currencyCount].abbreviation);
+				free(sysData->currencies[sysData->currencyCount].code);
+				free(sysData->currencies[sysData->currencyCount].symbol);
+				free(sysData->currencies[sysData->currencyCount].country);
+				free(sysData->currencies[sysData->currencyCount].createdAt);
+				free(sysData->currencies[sysData->currencyCount].updatedAt);
+				sleep(MID_SLEEP);
+				return;
+			}
+		}
+		else
+		{
+			sysData->currencies[sysData->currencyCount].deletedAt = strdup(_deletedAt);
+			if (sysData->currencies[sysData->currencyCount].deletedAt == NULL)
+			{
+				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				free(sysData->currencies[sysData->currencyCount].name);
+				free(sysData->currencies[sysData->currencyCount].abbreviation);
+				free(sysData->currencies[sysData->currencyCount].code);
+				free(sysData->currencies[sysData->currencyCount].symbol);
+				free(sysData->currencies[sysData->currencyCount].country);
+				free(sysData->currencies[sysData->currencyCount].createdAt);
+				free(sysData->currencies[sysData->currencyCount].updatedAt);
+				sleep(MID_SLEEP);
+				return;
+			}
 		}
 
 		sysData->currencyCount++;

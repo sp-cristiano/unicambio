@@ -1,12 +1,20 @@
 /**
- * @file userMenu.c
+ * @file adminMenu.c
+ *
+ * @author your name (you@domain.com)
+ * @brief
  * @version 0.1
+ * @date 2025-06-16
  *
  * @copyright Copyright (c) 2025
+ *
  */
 
-#include "unicambio.h"
-#include "structures.h"
-#include "logger.h"
+#include "../include/unicambio.h"
+#include "../include/structures.h"
+#include "../include/userMenu.h"
+#include "../include/logger.h"
 
-// void userMenu(SystemData *sysData) {}
+// void adminMenu(SystemData *sysData)
+// {
+// }

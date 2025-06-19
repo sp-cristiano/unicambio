@@ -7,12 +7,12 @@
  * @copyright Copyright (c) 2025
  *
  */
-#include "unicambio.h"
-#include "messages.h"
-#include "utilities.h"
-#include "structures.h"
-#include "logger.h"
-#include "homePageMenu.h"
+#include "../include/unicambio.h"
+#include "../include/messages.h"
+#include "../include/utilities.h"
+#include "../include/structures.h"
+#include "../include/logger.h"
+#include "../include/homePageMenu.h"
 
 // convert to uppercase
 char *toUpperCase(char *str)
@@ -38,23 +38,6 @@ void centerStringOnly(char *string)
 	printf("%s\n", string);
 	return;
 }
-//  This function will Center Strings
-
-// void printCenteredLine(char *line)
-// {
-// 	int len = strlen(line);
-// 	int padding = MAX_LINE_CONTENT - len;
-// 	int left = padding / 2;
-// 	int right = padding - left;
-
-// 	printf("*");
-// 	for (int i = 0; i < left; i++)
-// 		printf(" ");
-// 	printf("%s", line);
-// 	for (int i = 0; i < right; i++)
-// 		printf(" ");
-// 	printf("*\n");
-// }
 
 void alignStringRightOnly(char *string)
 {
@@ -68,124 +51,6 @@ void alignStringRightOnly(char *string)
 	printf("%s\n", string);
 	return;
 }
-
-// void centerString(char *text)
-// {
-// 	int len = strlen(text);
-// 	int start = 0;
-
-// 	while (start < len)
-// 	{
-// 		int end = start + MAX_LINE_CONTENT;
-// 		if (end >= len)
-// 		{
-// 			printCenteredLine(&text[start]);
-// 			break;
-// 		}
-
-// 		int split = end;
-
-// 		// If the character at split is not space, look backward or forward for the nearest space
-// 		if (!isspace(text[split]))
-// 		{
-// 			int back = split;
-// 			while (back > start && !isspace(text[back]))
-// 				back--;
-
-// 			int forward = split;
-// 			while (forward < len && !isspace(text[forward]))
-// 				forward++;
-
-// 			if (back > start)
-// 				split = back;
-// 			else if (forward < len)
-// 				split = forward;
-// 		}
-
-// 		// Copy the line and trim trailing space
-// 		char line[MAX_LINE_CONTENT + 1];
-
-// 		// Clear the buffer to avoid garbage data
-// 		memset(line, 0, sizeof(line));
-
-// 		strncpy(line, &text[start], split - start);
-// 		line[split - start] = '\0';
-
-// 		// Skip leading space on next line
-// 		start = split;
-// 		while (isspace(text[start]))
-// 			start++;
-
-// 		printCenteredLine(line);
-// 	}
-// }
-
-// // align string left
-// void alignStringRight(char *line)
-// {
-// 	int len = strlen(line);
-// 	int padding = (MAX_LINE_CONTENT - len);
-// 	for (int i = 0; i < padding; i++)
-// 	{
-// 		if (i == 0)
-// 		{
-// 			printf("*");
-// 		}
-// 		printf(" ");
-// 	}
-// 	printf("%s", line);
-// 	printf("*\n");
-// 	return;
-// }
-// void rightWrappedString(char *text)
-// {
-// 	int len = strlen(text);
-// 	int start = 0;
-
-// 	while (start < len)
-// 	{
-// 		int end = start + MAX_LINE_CONTENT;
-// 		if (end >= len)
-// 		{
-// 			alignStringRight(&text[start]);
-// 			break;
-// 		}
-
-// 		int split = end;
-
-// 		// Try to split at nearest space to keep words intact
-// 		if (!isspace(text[split]))
-// 		{
-// 			int back = split;
-// 			while (back > start && !isspace(text[back]))
-// 				back--;
-
-// 			int forward = split;
-// 			while (forward < len && !isspace(text[forward]))
-// 				forward++;
-
-// 			if (back > start)
-// 				split = back;
-// 			else if (forward < len)
-// 				split = forward;
-// 		}
-
-// 		// Copy the line and trim trailing space
-// 		char line[MAX_LINE_CONTENT + 1];
-// 		// Clear the buffer to avoid garbage data
-// 		memset(line, 0, sizeof(line));
-
-// 		strncpy(line, &text[start], split - start);
-// 		line[split - start] = '\0';
-
-// 		// Skip leading space on next line
-// 		start = split;
-// 		while (isspace(text[start]))
-// 			start++;
-
-// 		alignStringRight(line);
-// 	}
-// }
 
 //  print specific simbol
 void printSymbols(int quantity, char simbol)
@@ -476,8 +341,17 @@ int getCurrencyID(SystemData *sysData, const char *code)
 	centerStringOnly(UI_ERROR_CURRENCY_NOT_FOUND);
 	return failed;
 }
+double calculateRateToOneKz(double rate)
+{
+	double rateToOneKz = 1 / rate;
+	return rateToOneKz;
+}
+double revertRateFromOneKz(double rateToOneKz){
+	double rate = 1 / rateToOneKz;
+	return rate;
+}
 
-double getCurrencyRateByID(SystemData sysData, int currencyID)
+double getCurrencyRateToOneKzByID(SystemData sysData, int currencyID)
 {
 	for (size_t i = 0; i < sysData.currencyCount; i++)
 	{

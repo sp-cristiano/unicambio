@@ -44,8 +44,12 @@ void exitProgram(SystemData *sysData);
 int getUserRoleByID(SystemData *sysData, int userID);
 // Function to get the currency ID [Função para obter o ID da moeda]
 int getCurrencyID(SystemData *sysData, char *currencyName);
+// Function to calculate currencty rate to  one kz of currency
+double calculateRateToOneKz(double rate);
+// Function to revert rate from one kz
+double revertRateFromOneKz(double rateToOneKz);
 // Function to get the currency rate by ID [Função para obter o valor do caâmbio por ID]
-double getCurrencyRateByID(SystemData *sysData, int currencyID);
+double getCurrencyRateToOneKzByID(SystemData *sysData, int currencyID);
 // Function to get the currency code by id
 char *getCurrencyCodeByID(SystemData *sysData, int currencyID);
 #endif // UTILITIES_H

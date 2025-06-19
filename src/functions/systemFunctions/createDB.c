@@ -1,8 +1,8 @@
-#include "unicambio.h"
-#include "createDB.h"
-#include "messages.h"
-#include "logger.h"
-#include "utilities.h"
+#include "../include/unicambio.h"
+#include "../include/createDB.h"
+#include "../include/messages.h"
+#include "../include/logger.h"
+#include "../include/utilities.h"
 
 void createDB()
 {
@@ -15,7 +15,7 @@ void createDB()
 
 void createUserDBFile()
 {
-	FILE *checkUserFile = fopen("DB/user.txt", "r");
+	FILE *checkUserFile = fopen(USER_DATA_FILE_PATH, "r");
 	if (checkUserFile == NULL)
 	{
 		logMessages(LOG_WARNING, UI_ERROR_USER_DATA_FILE_NOT_FOUND);
@@ -25,7 +25,7 @@ void createUserDBFile()
 		centerStringOnly(UI_CREATING_USER_FILE);
 		sleep(MID_SLEEP);
 
-		FILE *userFile = fopen("DB/user.txt", "w");
+		FILE *userFile = fopen(USER_DATA_FILE_PATH, "w");
 		if (userFile == NULL)
 		{
 			logMessages(LOG_ERROR, UI_ERROR_CREATING_USER_DATA_FILE);
@@ -55,7 +55,7 @@ void createUserDBFile()
 
 void createCurrencyDBFile()
 {
-	FILE *checkCurrencyFile = fopen("DB/currencies.txt", "r");
+	FILE *checkCurrencyFile = fopen(CURRENCY_DATA_FILE_PATH, "r");
 	if (checkCurrencyFile == NULL)
 	{
 		logMessages(LOG_WARNING, UI_ERROR_CURRENCY_DATA_FILE_NOT_FOUND);
@@ -95,7 +95,7 @@ void createCurrencyDBFile()
 
 void createExchangeRateDBFile()
 {
-	FILE *checkExchangeRateFile = fopen("DB/exchangeRate.txt", "r");
+	FILE *checkExchangeRateFile = fopen(EXCHANGE_RATE_DATA_FILE_PATH, "r");
 	if (checkExchangeRateFile == NULL)
 	{
 		logMessages(LOG_WARNING, UI_ERROR_EXCHANGE_RATE_DATA_FILE_NOT_FOUND);
@@ -105,7 +105,7 @@ void createExchangeRateDBFile()
 		centerStringOnly(UI_CREATING_EXCHANGE_RATE_FILE);
 		sleep(MID_SLEEP);
 
-		FILE *exchangeRateFile = fopen("DB/exchangeRate.txt", "w");
+		FILE *exchangeRateFile = fopen(EXCHANGE_RATE_DATA_FILE_PATH, "w");
 		if (exchangeRateFile == NULL)
 		{
 			logMessages(LOG_ERROR, UI_ERROR_CREATING_EXCHANGE_RATE_DATA_FILE);
@@ -135,7 +135,7 @@ void createExchangeRateDBFile()
 
 void createTransactionDBFile()
 {
-	FILE *checkTransactionFile = fopen("DB/transactions.txt", "r");
+	FILE *checkTransactionFile = fopen(TRANSACTION_DATA_FILE_PATH, "r");
 	if (checkTransactionFile == NULL)
 	{
 		logMessages(LOG_WARNING, UI_ERROR_TRANSACTION_DATA_FILE_NOT_FOUND);
@@ -145,7 +145,7 @@ void createTransactionDBFile()
 		centerStringOnly(UI_CREATING_TRANSACTION_FILE);
 		sleep(MID_SLEEP);
 
-		FILE *transactionFile = fopen("DB/transactions.txt", "w");
+		FILE *transactionFile = fopen(TRANSACTION_DATA_FILE_PATH, "w");
 		if (transactionFile == NULL)
 		{
 			logMessages(LOG_ERROR, UI_ERROR_CREATING_TRANSACTION_DATA_FILE);

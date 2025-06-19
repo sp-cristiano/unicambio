@@ -1,12 +1,12 @@
 #include "../include/unicambio.h"
-#include "../include/adminUserDefaultSetup.h"
+#include "../include/userDefaultSetup.h"
 #include "../include/messages.h"
 #include "../include/logger.h"
 #include "../include/structures.h"
 #include "../include/utilities.h"
-#include "../include/adminFunctions.h"
+#include "../include/userFunctions.h"
 
-void createAdminUserDefaultSetup(SystemData *sysData)
+void createUserDefaultSetup(SystemData *sysData)
 {
 	FILE *checkUserFile = fopen(USER_DATA_FILE_PATH, "r");
 	if (checkUserFile != NULL)

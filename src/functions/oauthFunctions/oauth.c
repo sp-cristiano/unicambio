@@ -11,13 +11,13 @@ Including internal header files.
 [Incluindo arquivos de cabeçalho internos.]
 ******************************************************************************
 */
-#include "unicambio.h"
-#include "structures.h"
-#include "messages.h"
-#include "oauth.h"
-#include "utilities.h"
-#include "logger.h"
-#include "homePageMenu.h"
+#include "../include/unicambio.h"
+#include "../include/structures.h"
+#include "../include/messages.h"
+#include "../include/oauth.h"
+#include "../include/utilities.h"
+#include "../include/logger.h"
+#include "../include/homePageMenu.h"
 
 char *hashPassword(const char *password)
 {

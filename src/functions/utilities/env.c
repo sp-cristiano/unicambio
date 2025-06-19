@@ -9,11 +9,11 @@
  *
  */
 
-#include "unicambio.h"
-#include "env.h"
-#include "logger.h"
-#include "messages.h"
-#include "structures.h"
+#include "../include/unicambio.h"
+#include "../include/env.h"
+#include "../include/logger.h"
+#include "../include/messages.h"
+#include "../include/structures.h"
 
 /**
  * @brief Removes leading and trailing whitespace from a string in place. [Remove espaco em branco no inicio e no fim de uma string]
@@ -135,18 +135,30 @@ StatusInfo loadEnvFile(SystemData *sysData, const char *filePath)
 
 		if (strcmp(key, "ADMIN_USER_EMAIL") == 0)
 		{
-			free(sysData->appContext->ADMIN_USER_EMAIL); // prevent leaks [Evite vazamentos]
+			free(sysData->appContext->ADMIN_USER_EMAIL);
 			sysData->appContext->ADMIN_USER_EMAIL = strdup(value);
+			if(sysData->appContext->ADMIN_USER_EMAIL == NULL){
+				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				return failed;
+			}
 		}
 		else if (strcmp(key, "ADMIN_USER_PASSWORD") == 0)
 		{
 			free(sysData->appContext->ADMIN_USER_PASSWORD);
 			sysData->appContext->ADMIN_USER_PASSWORD = strdup(value);
+			if(sysData->appContext->ADMIN_USER_PASSWORD == NULL){
+				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				return failed;
+			}
 		}
 		else if (strcmp(key, "ADMIN_USER_PHONE") == 0)
 		{
 			free(sysData->appContext->ADMIN_USER_PHONE);
 			sysData->appContext->ADMIN_USER_PHONE = strdup(value);
+			if(sysData->appContext->ADMIN_USER_PHONE == NULL){
+				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				return failed;
+			}
 		}
 	}
 	fclose(envFile);
