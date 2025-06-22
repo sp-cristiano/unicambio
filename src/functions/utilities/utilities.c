@@ -346,7 +346,8 @@ double calculateRateToOneKz(double rate)
 	double rateToOneKz = 1 / rate;
 	return rateToOneKz;
 }
-double revertRateFromOneKz(double rateToOneKz){
+double revertRateFromOneKz(double rateToOneKz)
+{
 	double rate = 1 / rateToOneKz;
 	return rate;
 }
@@ -362,14 +363,41 @@ double getCurrencyRateToOneKzByID(SystemData sysData, int currencyID)
 	}
 	return failed;
 }
-char *getCurrencyCodeByID(SystemData sysData, int currencyID)
+char *getCurrencyCodeByID(SystemData *sysData, int currencyID)
 {
-	for (size_t i = 0; i < sysData.currencyCount; i++)
+	for (size_t i = 0; i < sysData->currencyCount; i++)
 	{
-		if (sysData.currencies[i].currencyID == currencyID)
+		if (sysData->currencies[i].currencyID == currencyID)
 		{
-			return sysData.currencies[i].code;
+			return sysData->currencies[i].code;
 		}
 	}
 	return NULL;
+}
+
+// Get user ID by username, email,or phone number.
+int getUserIDByMultipleSearch(SystemData *sysData, const char *multipleSearch)
+{
+	if (sysData == NULL)
+	{
+		logMessages(LOG_ERROR, UI_ERROR_SYSTEM_DATA_IS_NULL);
+		centerString(UI_ERROR_SYSTEM_DATA_IS_NULL);
+		sleep(MIN_SLEEP);
+		return failed;
+	}
+	char *tempCharMultipleSearch = malloc(sizeof(char) * MAX_NAME_LENGTH);
+	tempCharMultipleSearch = strcpy(tempCharMultipleSearch, multipleSearch);
+
+	toUpperCase(tempCharMultipleSearch);
+
+	int tempIntMultipleSearch = atoi(tempCharMultipleSearch);
+
+	for (size_t i = 0; i < sysData->currencyCount; i++)
+	{
+		if (sysData->users[i].userID == tempIntMultipleSearch || strcmp(sysData->users[i].userName, tempCharMultipleSearch) == 0 || strcmp(sysData->users[i].email, tempCharMultipleSearch) == 0 || strcmp(sysData->users[i].phone, tempCharMultipleSearch) == 0)
+		{
+			free(tempCharMultipleSearch);
+			return sysData->users[i].userID;
+		}
+	}
 }

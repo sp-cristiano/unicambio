@@ -1,5 +1,6 @@
 #include "../include/unicambio.h"
 #include "../include/exchangeRateFunctions.h"
+// #include "../include/transactionFunctions.h"
 #include "../include/structures.h"
 #include "../include/utilities.h"
 #include "../include/messages.h"
@@ -30,6 +31,7 @@ void createExchangeRateDefaultSetup(SystemData *sysData)
 	char *deletedAt = NULL;
 
 	createExchangeRate(sysData,fromCurrencyID, fromCurrencyAmountToConvert, exchangeRateStatus, toCurrencyID, createdAt, updatedAt, deletedAt);
+
 
 	free(getCurrentDateTime(TYPE_DATE_TIME));
 	sleep(MID_SLEEP);

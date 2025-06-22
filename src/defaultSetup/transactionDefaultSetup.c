@@ -7,6 +7,6 @@
 #include "../include/exchangeRateDefaultSetup.h"
 #include "../include/transactionDefaultSetup.h"
 
-void transactionDefaultSetup(SystemData *sysData){
-
+void createTransactionDefaultSetup(SystemData *sysData)
+{
 }

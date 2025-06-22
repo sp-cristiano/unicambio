@@ -140,10 +140,22 @@ void createExchangeRate(SystemData *sysData, int fromCurrencyID, double fromCurr
 		// revert exchange rate from one kz
 		double exchangeRate = revertRateFromOneKz(toCurrencyRateToKz);
 
-		createTransaction(sysData, exchangeRateID, userID, fromCurrencyID, fromCurrencyAmountToConvert, toCurrencyID, toCurrencyAmountConvertedTo, exchangeRateStatus, fromCurrencyCode, fromCurrencyRateToKz, toCurrencyCode, toCurrencyAmountConvertedTo, exchangeRate, createdAt, updatedAt, deletedAt);
+		if (sysData->appContext->currentUserID == 0)
+		{
+			userID = getUserIDByMultipleSearch(sysData, sysData->appContext->ADMIN_USER_PHONE);
+			
+			createTransaction(sysData, exchangeRateID, userID, fromCurrencyID, fromCurrencyAmountToConvert, toCurrencyID, toCurrencyAmountConvertedTo, exchangeRateStatus, fromCurrencyCode, fromCurrencyRateToKz, toCurrencyCode, toCurrencyAmountConvertedTo, exchangeRate, createdAt, updatedAt, deletedAt);
+			sysData->exchangeRateCount++;
+			saveExchangeRateData(sysData);
+		}
+		else
+		{
 
-		sysData->exchangeRateCount++;
-		saveExchangeRateData(sysData);
+			createTransaction(sysData, exchangeRateID, userID, fromCurrencyID, fromCurrencyAmountToConvert, toCurrencyID, toCurrencyAmountConvertedTo, exchangeRateStatus, fromCurrencyCode, fromCurrencyRateToKz, toCurrencyCode, toCurrencyAmountConvertedTo, exchangeRate, createdAt, updatedAt, deletedAt);
+
+			sysData->exchangeRateCount++;
+			saveExchangeRateData(sysData);
+		}
 	}
 	else
 	{
