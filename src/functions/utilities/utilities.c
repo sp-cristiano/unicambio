@@ -15,15 +15,32 @@
 #include "../include/homePageMenu.h"
 
 // convert to uppercase
-char *toUpperCase(char *str)
+char *toUpperCase(const char *str)
 {
-	char *p = str;
-	while (*p)
+	if (!str)
 	{
-		*p = (char)toupper((unsigned char)*p);
-		p++;
+		return NULL;
 	}
-	return str;
+	size_t len = strlen(str);
+	char *upperStr = malloc(len + 1);
+	if (!upperStr)
+	{
+		logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+		return NULL;
+	}
+	for (size_t i = 0; i < len; i++)
+	{
+		upperStr[i] = (char)toupper((unsigned char)str[i]);
+	}
+	upperStr[len] = '\0';
+	return upperStr;
+	// char *p = str;
+	// while (*p)
+	// {
+	// 	*p = (char)toupper((unsigned char)*p);
+	// 	p++;
+	// }
+	// return str;
 }
 
 void centerStringOnly(char *string)
@@ -316,7 +333,7 @@ int getCurrencyID(SystemData *sysData, const char *code)
 	if (sysData == NULL)
 	{
 		logMessages(LOG_ERROR, UI_ERROR_SYSTEM_DATA_IS_NULL);
-		centerString(UI_ERROR_SYSTEM_DATA_IS_NULL);
+		centerStringOnly(UI_ERROR_SYSTEM_DATA_IS_NULL);
 		sleep(MIN_SLEEP);
 		return failed;
 	}
@@ -337,7 +354,7 @@ int getCurrencyID(SystemData *sysData, const char *code)
 	}
 
 	free(tempCharCode);
-	logMessage(LOG_ERROR, UI_ERROR_CURRENCY_NOT_FOUND);
+	logMessages(LOG_ERROR, UI_ERROR_CURRENCY_NOT_FOUND);
 	centerStringOnly(UI_ERROR_CURRENCY_NOT_FOUND);
 	return failed;
 }
@@ -352,13 +369,13 @@ double revertRateFromOneKz(double rateToOneKz)
 	return rate;
 }
 
-double getCurrencyRateToOneKzByID(SystemData sysData, int currencyID)
+double getCurrencyRateToOneKzByID(SystemData *sysData, int currencyID)
 {
-	for (size_t i = 0; i < sysData.currencyCount; i++)
+	for (size_t i = 0; i < sysData->currencyCount; i++)
 	{
-		if (sysData.currencies[i].currencyID == currencyID)
+		if (sysData->currencies[i].currencyID == currencyID)
 		{
-			return sysData.currencies[i].rateToOneKz;
+			return sysData->currencies[i].rateToOneKz;
 		}
 	}
 	return failed;
@@ -381,7 +398,7 @@ int getUserIDByMultipleSearch(SystemData *sysData, const char *multipleSearch)
 	if (sysData == NULL)
 	{
 		logMessages(LOG_ERROR, UI_ERROR_SYSTEM_DATA_IS_NULL);
-		centerString(UI_ERROR_SYSTEM_DATA_IS_NULL);
+		centerStringOnly(UI_ERROR_SYSTEM_DATA_IS_NULL);
 		sleep(MIN_SLEEP);
 		return failed;
 	}
@@ -400,4 +417,5 @@ int getUserIDByMultipleSearch(SystemData *sysData, const char *multipleSearch)
 			return sysData->users[i].userID;
 		}
 	}
+	return failed;
 }

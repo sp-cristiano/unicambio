@@ -4,6 +4,7 @@
 #include "../include/structures.h"
 #include "../include/messages.h"
 #include "../include/logger.h"
+#include "../include/transactionFunctions.h"
 
 void createExchangeRate(SystemData *sysData, int fromCurrencyID, double fromCurrencyAmountToConvert, int exchangeRateStatus, int toCurrencyID, char *createdAt, char *updatedAt, char *deletedAt)
 {
@@ -73,7 +74,7 @@ void createExchangeRate(SystemData *sysData, int fromCurrencyID, double fromCurr
 		char *fromCurrencyCode = getCurrencyCodeByID(sysData, fromCurrencyID);
 
 		// Get to currency Rate by to currency id
-		double toCurrencyRate = getCurrencyRateToneKzByID(sysData, toCurrencyID);
+		double toCurrencyRate = getCurrencyRateToOneKzByID(sysData, toCurrencyID);
 
 		// Convert from currency amount that has been converted to kwanza to to currency amount in to currency currency
 		double toCurrencyAmountConvertedTo = fromCurrencyRateToKz * toCurrencyRate;
@@ -139,19 +140,18 @@ void createExchangeRate(SystemData *sysData, int fromCurrencyID, double fromCurr
 		}
 		// revert exchange rate from one kz
 		double exchangeRate = revertRateFromOneKz(toCurrencyRateToKz);
+		int transactionStatus = successful;
 
 		if (sysData->appContext->currentUserID == 0)
 		{
 			userID = getUserIDByMultipleSearch(sysData, sysData->appContext->ADMIN_USER_PHONE);
-			
-			createTransaction(sysData, exchangeRateID, userID, fromCurrencyID, fromCurrencyAmountToConvert, toCurrencyID, toCurrencyAmountConvertedTo, exchangeRateStatus, fromCurrencyCode, fromCurrencyRateToKz, toCurrencyCode, toCurrencyAmountConvertedTo, exchangeRate, createdAt, updatedAt, deletedAt);
+
+			createTransaction(sysData, exchangeRateID, userID, fromCurrencyID, fromCurrencyAmountToConvert, toCurrencyID, toCurrencyAmountConvertedTo, exchangeRate, exchangeRateStatus, fromCurrencyCode, fromCurrencyRateToKz, toCurrencyCode, transactionStatus, createdAt, updatedAt, deletedAt);
 			sysData->exchangeRateCount++;
 			saveExchangeRateData(sysData);
 		}
 		else
 		{
-
-			createTransaction(sysData, exchangeRateID, userID, fromCurrencyID, fromCurrencyAmountToConvert, toCurrencyID, toCurrencyAmountConvertedTo, exchangeRateStatus, fromCurrencyCode, fromCurrencyRateToKz, toCurrencyCode, toCurrencyAmountConvertedTo, exchangeRate, createdAt, updatedAt, deletedAt);
 
 			sysData->exchangeRateCount++;
 			saveExchangeRateData(sysData);

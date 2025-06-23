@@ -172,7 +172,11 @@ typedef struct
 	int toCurrencyID; ///< Currency being exchanged to [Moeda sendo trocada para]
 	double toCurrencyAmount;
 	double exchangeRate; ///< Exchange rate information [Informações de câmbio]
-	// double amount;										///< Amount of currency being exchanged [Quantidade de moeda sendo trocada]
+	// double amount;
+	int exchangeRateStatus;								///< Amount of currency being exchanged [Quantidade de moeda sendo trocada]
+	char *fromCurrencyCode;						///< Exchange rate value [Valor do câmbio]
+	double fromCurrencyRateToKz;				///< Exchange rate value [Valor do câmbio]
+	char *toCurrencyCode;
 	int transactionStatus; ///< Transaction status [Status da transação]
 	char *createdAt;			 ///< Date of transaction creation [Data de criação da transação]
 	char *updatedAt;			 ///< Date of last transaction update [Data da última atualização da transação]

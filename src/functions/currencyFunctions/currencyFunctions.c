@@ -41,7 +41,7 @@ void createCurrency(SystemData *sysData, char *name, char *abbreviation, char *c
 		int currencyID = randomNumber(10000, 11000);
 
 		// check if currency already exists [Verifique se a moeda já existe]
-		for (int i = 0; i < sysData->currencyCount; i++)
+		for (size_t i = 0; i < sysData->currencyCount; i++)
 		{
 			if (sysData->currencies[i].currencyID == currencyID)
 			{
@@ -269,7 +269,7 @@ void loadCurrencyData(SystemData *sysData)
 	// Initializing sysData->currencyCount to 0
 	sysData->currencyCount = 0;
 
-	while (fscanf(currencyFile, "%d|%149[^|]|%149[^|]|%149[^|]|%149[^|]|%149[^|]|%d|%lf|%99[^|]|%99[^|]|%99[^|]\n", &_currencyID, _name, _abbreviation, _code, _symbol, _country, &_currencyStatus, _rateToOneKz, _createdAt, _updatedAt, _deletedAt) != EOF && sysData->currencyCount < sysData->currencyCapacity)
+	while (fscanf(currencyFile, "%d|%149[^|]|%149[^|]|%149[^|]|%149[^|]|%149[^|]|%d|%lf|%99[^|]|%99[^|]|%99[^|]\n", &_currencyID, _name, _abbreviation, _code, _symbol, _country, &_currencyStatus, &_rateToOneKz, _createdAt, _updatedAt, _deletedAt) != EOF && sysData->currencyCount < sysData->currencyCapacity)
 	{
 		if (sysData->currencyCount >= sysData->currencyCapacity)
 		{
@@ -447,7 +447,7 @@ void loadCurrencyData(SystemData *sysData)
 // Free Currency Data
 void freeCurrencyData(SystemData *sysData)
 {
-	for (int i = 0; i < sysData->currencyCount; i++)
+	for (size_t i = 0; i < sysData->currencyCount; i++)
 	{
 		free(sysData->currencies[i].name);
 		free(sysData->currencies[i].abbreviation);

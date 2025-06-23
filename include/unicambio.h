@@ -101,6 +101,8 @@
 #define DEFAULT_AOA_TO_1_USD_CURRENCY_RATE 939.316
 #define DEFAULT_AOA_TO_1_AOA_CURRENCY_RATE 1.00
 
+#define MAX_CURRENCY_CODE_LENGTH 10
+
 /**
  * @brief Default Currency Country
  */

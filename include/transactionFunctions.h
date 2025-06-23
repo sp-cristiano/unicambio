@@ -4,7 +4,7 @@
 #include "../include/structures.h"
 
 // Create Transaction
-void createTransaction(SystemData *sysData, int exchangeRateID, int userID, int fromCurrencyID, double fromCurrencyAmountToConvert, int toCurrencyID, double toCurrencyAmountConvertedTo, double exchangeRate, int transactionStatus, char *createdAt, char *updatedAt, char *deletedAt);
+void createTransaction(SystemData *sysData, int exchangeRateID, int userID, int fromCurrencyID, double fromCurrencyAmountToConvert, int toCurrencyID, double toCurrencyAmountConvertedTo, double exchangeRate, int exchangeRateStatus, char *fromCurrencyCode, double fromCurrencyRateToKz, char *toCurrencyCode, int transactionStatus, char *createdAt, char *updatedAt, char *deletedAt);
 
 // Save Transaction
 void saveTransactionData(SystemData *sysData);

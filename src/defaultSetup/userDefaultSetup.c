@@ -20,7 +20,7 @@ void createUserDefaultSetup(SystemData *sysData)
 
 	char *name = DEFAULT_ADMIN_NAME;
 	char *userName = DEFAULT_ADMIN_USERNAME;
-	char *email = sysData->appContext;
+	char *email = sysData->appContext->ADMIN_USER_EMAIL;
 	char *password = sysData->appContext->ADMIN_USER_PASSWORD;
 	char *phone = sysData->appContext->ADMIN_USER_PHONE;
 	int roleID = ROLE_ADMIN;

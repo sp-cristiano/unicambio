@@ -51,7 +51,7 @@ void createUser(SystemData *sysData, char *name, char *userName, char *email, ch
 		int userID = randomNumber(1000, 9999); // Generate random userID [Gere um ID de usuário aleatório]
 
 		// check if user already exists [Verifique se o usuário já existe]
-		for (int i = 0; i < sysData->userCount; i++)
+		for (size_t i = 0; i < sysData->userCount; i++)
 		{
 			if (sysData->users[i].userID == userID)
 			{
@@ -248,7 +248,7 @@ void loadUserData(SystemData *sysData)
 	}
 	// initialize variables for reading data
 	int _userID, _roleID, _userStatus;
-	char _name[MAX_NAME_LENGTH], *_userName[MAX_NAME_LENGTH], _email[MAX_NAME_LENGTH], _password[MAX_PASSWORD_LENGTH], _phone[MAX_NAME_LENGTH], *_createAt[MAX_DATE_LENGTH], _lastSeen[MAX_DATE_LENGTH], _deletedAt[MAX_DATE_LENGTH];
+	char _name[MAX_NAME_LENGTH], _userName[MAX_NAME_LENGTH], _email[MAX_NAME_LENGTH], _password[MAX_PASSWORD_LENGTH], _phone[MAX_NAME_LENGTH], _createAt[MAX_DATE_LENGTH], _lastSeen[MAX_DATE_LENGTH], _deletedAt[MAX_DATE_LENGTH];
 
 	// adjust user capacity if needed.
 	if (sysData->userCapacity == 0)
@@ -277,7 +277,7 @@ void loadUserData(SystemData *sysData)
 
 	// Read data from file [Leia dados do arquivo]
 
-	while (fscanf(usersFile, "%d|%149[^|]|%149[^|]|%149[^|]|%299[^|]|%149[^|]|%d|%d|%99[^|]|%99[^|]|%99[^|]\n", &_userID, &_name, &_userName, &_email, &_password, &_phone, &_roleID, &_userStatus, &_createAt, &_lastSeen, &_deletedAt) != EOF && sysData->userCount < sysData->userCapacity)
+	while (fscanf(usersFile, "%d|%149[^|]|%149[^|]|%149[^|]|%299[^|]|%149[^|]|%d|%d|%99[^|]|%99[^|]|%99[^|]\n", &_userID, _name, _userName, _email, _password, _phone, &_roleID, &_userStatus, _createAt, _lastSeen, _deletedAt) != EOF && sysData->userCount < sysData->userCapacity)
 	{
 		// Check if userCount exceeds userCapacity
 		if (sysData->userCount >= sysData->userCapacity)

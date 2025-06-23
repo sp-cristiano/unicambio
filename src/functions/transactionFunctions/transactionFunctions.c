@@ -12,7 +12,7 @@
 #include "../include/logger.h"
 #include "../include/utilities.h"
 
-void createTransaction(SystemData *sysData, int exchangeRateID, int userID, int fromCurrencyID, double fromCurrencyAmountToConvert, int toCurrencyID, double toCurrencyAmountConvertedTo, double exchangeRate, int transactionStatus, char *createdAt, char *updatedAt, char *deletedAt)
+void createTransaction(SystemData *sysData, int exchangeRateID, int userID, int fromCurrencyID, double fromCurrencyAmountToConvert, int toCurrencyID, double toCurrencyAmountConvertedTo, double exchangeRate, int exchangeRateStatus, char *fromCurrencyCode, double fromCurrencyRateToKz, char *toCurrencyCode, int transactionStatus, char *createdAt, char *updatedAt, char *deletedAt)
 {
 	// check if sysData pointer is valid
 	if (sysData == NULL)
@@ -63,6 +63,25 @@ void createTransaction(SystemData *sysData, int exchangeRateID, int userID, int 
 	sysData->transactions[sysData->transactionCount].toCurrencyID = toCurrencyID;
 	sysData->transactions[sysData->transactionCount].toCurrencyAmount = toCurrencyAmountConvertedTo;
 	sysData->transactions[sysData->transactionCount].exchangeRate = exchangeRate;
+	sysData->transactions[sysData->transactionCount].exchangeRateStatus = exchangeRateStatus;
+	sysData->transactions[sysData->transactionCount].fromCurrencyCode = strdup(fromCurrencyCode);
+	if (sysData->transactions[sysData->transactionCount].fromCurrencyCode == NULL)
+	{
+		logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+		centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+		sleep(MID_SLEEP);
+		return;
+	}
+	sysData->transactions[sysData->transactionCount].fromCurrencyRateToKz = fromCurrencyRateToKz;
+	sysData->transactions[sysData->transactionCount].toCurrencyCode = strdup(toCurrencyCode);
+	if (sysData->transactions[sysData->transactionCount].toCurrencyCode == NULL)
+	{
+		logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+		centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+		free(sysData->transactions[sysData->transactionCount].fromCurrencyCode);
+		sleep(MID_SLEEP);
+		return;
+	}
 	sysData->transactions[sysData->transactionCount].transactionStatus = transactionStatus;
 
 	sysData->transactions[sysData->transactionCount].createdAt = strdup(createdAt);
@@ -138,7 +157,7 @@ void saveTransactionData(SystemData *sysData)
 	}
 	for (size_t i = 0; i < sysData->transactionCount; i++)
 	{
-		fprintf(transactionFile, "%d|%d|%d|%d|%lf|%d|%lf|%lf|%d|%s|%s\n", sysData->transactions[i].transactionID, sysData->transactions[i].exchangeRateID, sysData->transactions[i].userID, sysData->transactions[i].fromCurrencyID, sysData->transactions[i].fromCurrencyAmount, sysData->transactions[i].toCurrencyID, sysData->transactions[i].toCurrencyAmount, sysData->transactions[i].exchangeRate, sysData->transactions[i].transactionStatus, sysData->transactions[i].createdAt, sysData->transactions[i].updatedAt, sysData->transactions[i].deletedAt);
+		fprintf(transactionFile, "%d|%d|%d|%d|%lf|%d|%lf|%lf|%d|%s|%lf|%s|%d|%s|%s|%s\n", sysData->transactions[i].transactionID, sysData->transactions[i].exchangeRateID, sysData->transactions[i].userID, sysData->transactions[i].fromCurrencyID, sysData->transactions[i].fromCurrencyAmount, sysData->transactions[i].toCurrencyID, sysData->transactions[i].toCurrencyAmount, sysData->transactions[i].exchangeRate, sysData->transactions[i].exchangeRateStatus, sysData->transactions[i].fromCurrencyCode, sysData->transactions[i].fromCurrencyRateToKz, sysData->transactions[i].toCurrencyCode, sysData->transactions[i].transactionStatus, sysData->transactions[i].createdAt, sysData->transactions[i].updatedAt, sysData->transactions[i].deletedAt);
 	}
 	fclose(transactionFile);
 	return;
@@ -165,9 +184,9 @@ void loadTransactionData(SystemData *sysData)
 	}
 
 	// Initialize variables for reading data
-	int _transactionID, _exchangeRateID, _userID, _fromCurrencyID, _toCurrencyID, _transactionStatus;
-	double _fromCurrencyAmount, _toCurrencyAmount, _exchangeRate;
-	char *_createdAt[MAX_DATE_LENGTH], *_updatedAt[MAX_DATE_LENGTH], *_deletedAt[MAX_DATE_LENGTH];
+	int _transactionID, _exchangeRateID, _userID, _fromCurrencyID, _toCurrencyID, _exchangeRateStatus, _transactionStatus;
+	double _fromCurrencyAmount, _toCurrencyAmount, _exchangeRate, _fromCurrencyRateToKz;
+	char _fromCurrencyCode[MAX_CURRENCY_CODE_LENGTH], _toCurrencyCode[MAX_CURRENCY_CODE_LENGTH], _createdAt[MAX_DATE_LENGTH], _updatedAt[MAX_DATE_LENGTH], _deletedAt[MAX_DATE_LENGTH];
 
 	// Adjusting transaction capacity if needed.
 	if (sysData->transactionCapacity == 0)
@@ -193,9 +212,8 @@ void loadTransactionData(SystemData *sysData)
 
 	// Initializing syData->transactionCount to 0
 	sysData->transactionCount = 0;
-
 	// Read data from transaction file and store it in the transaction structure
-	while (fscanf(transactionFile, "%d|%d|%d|%d|%lf|%d|%lf|%lf|%d|%99[^|]|%99[^|]\n", &_transactionID, &_exchangeRateID, &_userID, &_fromCurrencyID, &_fromCurrencyAmount, &_toCurrencyID, &_toCurrencyAmount, &_exchangeRate, &_transactionStatus, _createdAt, _updatedAt, _deletedAt) != EOF && sysData->transactionCount < sysData->transactionCapacity)
+	while (fscanf(transactionFile, "%d|%d|%d|%d|%lf|%d|%lf|%lf|%d|%9[^|]|%lf|%9[^|]|%d|%99[^|]|%99[^|]|%99[^|]\n", &_transactionID, &_exchangeRateID, &_userID, &_fromCurrencyID, &_fromCurrencyAmount, &_toCurrencyID, &_toCurrencyAmount, &_exchangeRate, &_exchangeRateStatus, _fromCurrencyCode, &_fromCurrencyRateToKz, _toCurrencyCode, &_transactionStatus, _createdAt, _updatedAt, _deletedAt) != EOF && sysData->transactionCount < sysData->transactionCapacity)
 	{
 		// check if transaction capacity need adjustment [Verifique se a capacidade de transação precisa de ajuste]
 		if (sysData->transactionCount >= sysData->transactionCapacity)
@@ -220,12 +238,33 @@ void loadTransactionData(SystemData *sysData)
 		sysData->transactions[sysData->transactionCount].toCurrencyID = _toCurrencyID;
 		sysData->transactions[sysData->transactionCount].toCurrencyAmount = _toCurrencyAmount;
 		sysData->transactions[sysData->transactionCount].exchangeRate = _exchangeRate;
+		sysData->transactions[sysData->transactionCount].exchangeRateStatus = _exchangeRateStatus;
+		sysData->transactions[sysData->transactionCount].fromCurrencyCode = strdup(_fromCurrencyCode);
+		if (sysData->transactions[sysData->transactionCount].fromCurrencyCode == NULL)
+		{
+			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			sleep(MID_SLEEP);
+			return;
+		}
+		sysData->transactions[sysData->transactionCount].fromCurrencyRateToKz = _fromCurrencyRateToKz;
+		sysData->transactions[sysData->transactionCount].toCurrencyCode = strdup(_toCurrencyCode);
+		if (sysData->transactions[sysData->transactionCount].toCurrencyCode == NULL)
+		{
+			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			free(sysData->transactions[sysData->transactionCount].fromCurrencyCode);
+			sleep(MID_SLEEP);
+			return;
+		}
 		sysData->transactions[sysData->transactionCount].transactionStatus = _transactionStatus;
 		sysData->transactions[sysData->transactionCount].createdAt = strdup(_createdAt);
 		if (sysData->transactions[sysData->transactionCount].createdAt == NULL)
 		{
 			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			free(sysData->transactions[sysData->transactionCount].fromCurrencyCode);
+			free(sysData->transactions[sysData->transactionCount].toCurrencyCode);
 			sleep(MID_SLEEP);
 			return;
 		}
@@ -234,6 +273,9 @@ void loadTransactionData(SystemData *sysData)
 		{
 			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			free(sysData->transactions[sysData->transactionCount].fromCurrencyCode);
+			free(sysData->transactions[sysData->transactionCount].toCurrencyCode);
+			free(sysData->transactions[sysData->transactionCount].createdAt);
 			sleep(MID_SLEEP);
 			return;
 		}
@@ -246,6 +288,10 @@ void loadTransactionData(SystemData *sysData)
 			{
 				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 				centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				free(sysData->transactions[sysData->transactionCount].fromCurrencyCode);
+				free(sysData->transactions[sysData->transactionCount].toCurrencyCode);
+				free(sysData->transactions[sysData->transactionCount].createdAt);
+				free(sysData->transactions[sysData->transactionCount].updatedAt);
 				sleep(MID_SLEEP);
 				return;
 			}
@@ -278,6 +324,8 @@ void freeTransactionData(SystemData *sysData)
 	}
 	for (size_t i = 0; i < sysData->transactionCount; i++)
 	{
+		free(sysData->transactions[i].fromCurrencyCode);
+		free(sysData->transactions[i].toCurrencyCode);
 		free(sysData->transactions[i].createdAt);
 		free(sysData->transactions[i].updatedAt);
 		free(sysData->transactions[i].deletedAt);

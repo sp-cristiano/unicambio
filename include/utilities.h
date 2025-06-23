@@ -4,7 +4,7 @@
 #include "../include/structures.h"
 
 // convert string to uppercase
-char *toUpperCase(char *str);
+char *toUpperCase(const char *str);
 
 // Function to print centered lines [Função para imprimir linhas centralizadas]
 // void printCenteredLine(char *line);
@@ -43,7 +43,7 @@ void exitProgram(SystemData *sysData);
 // Function to get the user role by ID [Função para obter o papel do usuário por ID]
 int getUserRoleByID(SystemData *sysData, int userID);
 // Function to get the currency ID [Função para obter o ID da moeda]
-int getCurrencyID(SystemData *sysData, char *currencyName);
+int getCurrencyID(SystemData *sysData, const char *currencyName);
 // Function to calculate currencty rate to  one kz of currency
 double calculateRateToOneKz(double rate);
 // Function to revert rate from one kz
@@ -52,4 +52,5 @@ double revertRateFromOneKz(double rateToOneKz);
 double getCurrencyRateToOneKzByID(SystemData *sysData, int currencyID);
 // Function to get the currency code by id
 char *getCurrencyCodeByID(SystemData *sysData, int currencyID);
+int getUserIDByMultipleSearch(SystemData *sysData, const char *multipleSearch);
 #endif // UTILITIES_H

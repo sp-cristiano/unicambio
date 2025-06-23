@@ -30,13 +30,14 @@ void createCurrencyDefaultSetup(SystemData *sysData)
 	char *deletedAt = NULL;
 
 	createCurrency(sysData, name, abbreviation, code, symbol, country, currencyStatus, rateToOneKz, createdAt, updatedAt, deletedAt);
-	free(getCurrentDateTime(TYPE_DATE_TIME));
-	// free(code);
+	free(createdAt);
+	free(updatedAt);
+	free(code);
 
 	// creating the second default currency
 	name = DEFAULT_CURRENCY_NAME_2;
 	abbreviation = DEFAULT_CURRENCY_ABBREVIATION_2;
-	code = DEFAULT_CURRENCY_CODE_2;
+	code = toUpperCase(DEFAULT_CURRENCY_CODE_2);
 	symbol = DEFAULT_CURRENCY_SYMBOL_2;
 	country = DEFAULT_CURRENCY_COUNTRY_2;
 	rateToOneKz = calculateRateToOneKz(DEFAULT_AOA_TO_1_AOA_CURRENCY_RATE);
@@ -46,7 +47,9 @@ void createCurrencyDefaultSetup(SystemData *sysData)
 	deletedAt = NULL;
 
 	createCurrency(sysData, name, abbreviation, code, symbol, country, currencyStatus, rateToOneKz, createdAt, updatedAt, deletedAt);
-	free(getCurrentDateTime(TYPE_DATE_TIME));
+
+	free(createdAt);
+	free(updatedAt);
 	free(code);
 	sleep(MID_SLEEP);
 	return;

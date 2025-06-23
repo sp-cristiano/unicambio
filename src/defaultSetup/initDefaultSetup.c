@@ -13,5 +13,4 @@ void initDefaultSetup(SystemData *sysData)
 	createUserDefaultSetup(sysData);
 	createCurrencyDefaultSetup(sysData);
 	createExchangeRateDefaultSetup(sysData);
-	createTransactionDefaultSetup(sysData);
 }

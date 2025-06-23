@@ -3,12 +3,12 @@
 #include "../include/currencyFunctions.h"
 #include "../include/exchangeRateFunctions.h"
 #include "../include/transactionFunctions.h"
-void loadSystemData(SystemData *sysData) {
+#include "../include/loadSystemData.h"
+void loadSystemData(SystemData *sysData)
+{
 
 	loadUserData(sysData);
 	loadCurrencyData(sysData);
 	loadExchangeRateData(sysData);
 	loadTransactionData(sysData);
-
-
 }
