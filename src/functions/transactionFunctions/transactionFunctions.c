@@ -15,43 +15,40 @@
 void createTransaction(SystemData *sysData, int exchangeRateID, int userID, int fromCurrencyID, double fromCurrencyAmountToConvert, int toCurrencyID, double toCurrencyAmountConvertedTo, double exchangeRate, int exchangeRateStatus, char *fromCurrencyCode, double fromCurrencyRateToKz, char *toCurrencyCode, int transactionStatus, char *createdAt, char *updatedAt, char *deletedAt)
 {
 	// check if sysData pointer is valid
-	if (sysData == NULL)
+	if (sysData == NULL || sysData->appContext == NULL)
 	{
 		logMessages(LOG_ERROR, UI_ERROR_SYSTEM_DATA_IS_NULL);
-		centerStringOnly(UI_ERROR_SYSTEM_DATA_IS_NULL);
 		sleep(MID_SLEEP);
 		return;
 	}
 	int transactionID = randomNumber(80010, 99090);
 
 	// Check if transaction capacity need adjustment [Verifique se a capacidade de transação precisa de ajuste]
-	if (sysData->transactionCapacity == 0)
+	if (sysData->transactionCount >= sysData->transactionCapacity)
 	{
-		sysData->transactionCapacity = 2;
+		size_t newCapacity = (sysData->transactionCapacity + 2) * 2;
+		TransactionInfo *tempTransactionSize = realloc(sysData->transactions, sizeof(TransactionInfo) * newCapacity);
+		if (!tempTransactionSize)
+		{
+			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			sleep(MID_SLEEP);
+			return;
+		}
+		sysData->transactions = tempTransactionSize;
+		sysData->transactionCapacity = newCapacity;
 	}
-	else if (sysData->transactionCount >= sysData->transactionCapacity)
-	{
-		sysData->transactionCapacity = (sysData->transactionCapacity + 2) * 2;
-	}
-
-	// Reallocate Memory to the transaction structure.
-	TransactionInfo *tempTransactionSize = realloc(sysData->transactions, sizeof(TransactionInfo) * sysData->transactionCapacity);
-	if (tempTransactionSize == NULL)
-	{
-		logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-		centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-		sleep(MID_SLEEP);
-		return;
-	}
-	sysData->transactions = tempTransactionSize;
 
 	// Check if transactionID already exists [Verifique se o ID da transação já existe]
-	for (size_t i = 0; i < sysData->transactionCount; i++)
+	if (sysData->transactions != NULL && sysData->transactionCount > 0)
 	{
-		if (sysData->transactions[i].transactionID == transactionID)
+		for (size_t i = 0; i < sysData->transactionCount; i++)
 		{
-			transactionID = randomNumber(80010, 99090);
-			i = -1;
+			if (sysData->transactions[i].transactionID == transactionID)
+			{
+				transactionID = randomNumber(80010, 99090);
+				i = 0;
+			}
 		}
 	}
 	// Allocate memory for transaction history and copy strings for new transaction history
@@ -65,78 +62,58 @@ void createTransaction(SystemData *sysData, int exchangeRateID, int userID, int 
 	sysData->transactions[sysData->transactionCount].exchangeRate = exchangeRate;
 	sysData->transactions[sysData->transactionCount].exchangeRateStatus = exchangeRateStatus;
 	sysData->transactions[sysData->transactionCount].fromCurrencyCode = strdup(fromCurrencyCode);
-	if (sysData->transactions[sysData->transactionCount].fromCurrencyCode == NULL)
+	if (!sysData->transactions[sysData->transactionCount].fromCurrencyCode)
 	{
-		logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-		centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-		sleep(MID_SLEEP);
+		logAndFreeTransaction(sysData, sysData->transactionCount, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 		return;
 	}
+
 	sysData->transactions[sysData->transactionCount].fromCurrencyRateToKz = fromCurrencyRateToKz;
+
 	sysData->transactions[sysData->transactionCount].toCurrencyCode = strdup(toCurrencyCode);
-	if (sysData->transactions[sysData->transactionCount].toCurrencyCode == NULL)
+	if (!sysData->transactions[sysData->transactionCount].toCurrencyCode)
 	{
-		logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-		centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-		free(sysData->transactions[sysData->transactionCount].fromCurrencyCode);
-		sleep(MID_SLEEP);
+		logAndFreeTransaction(sysData, sysData->transactionCount, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 		return;
 	}
 	sysData->transactions[sysData->transactionCount].transactionStatus = transactionStatus;
 
 	sysData->transactions[sysData->transactionCount].createdAt = strdup(createdAt);
-	if (sysData->transactions[sysData->transactionCount].createdAt == NULL)
+	if (!sysData->transactions[sysData->transactionCount].createdAt)
 	{
-		logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-		centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-		sleep(MID_SLEEP);
+		logAndFreeTransaction(sysData, sysData->transactionCount, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 		return;
 	}
+
 	sysData->transactions[sysData->transactionCount].updatedAt = strdup(updatedAt);
-	if (sysData->transactions[sysData->transactionCount].updatedAt == NULL)
+	if (!sysData->transactions[sysData->transactionCount].updatedAt)
 	{
-		logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-		centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-		free(sysData->transactions[sysData->transactionCount].createdAt);
-		sleep(MID_SLEEP);
+		logAndFreeTransaction(sysData, sysData->transactionCount, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 		return;
 	}
 
-	sysData->transactions[sysData->transactionCount].deletedAt = strdup(deletedAt);
-
-	if (sysData->transactions[sysData->transactionCount].deletedAt == NULL)
+	if (deletedAt != NULL)
 	{
-		strcpy(deletedAt, " ");
-		sysData->transactions[sysData->transactionCount].deletedAt = strdup(deletedAt);
-		if (sysData->transactions[sysData->transactionCount].deletedAt == NULL)
-		{
 
-			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			free(sysData->transactions[sysData->transactionCount].createdAt);
-			free(sysData->transactions[sysData->transactionCount].updatedAt);
-			sleep(MID_SLEEP);
-			return;
-		}
+		sysData->transactions[sysData->transactionCount].deletedAt = strdup(deletedAt);
 	}
 	else
 	{
-		sysData->transactions[sysData->transactionCount].deletedAt = strdup(deletedAt);
-		if (sysData->transactions[sysData->transactionCount].deletedAt == NULL)
-		{
-			logMessages(LOG_ERROR, UI_ERROR_TRANSACTION_DATA_IS_NULL);
-			centerStringOnly(UI_ERROR_TRANSACTION_DATA_IS_NULL);
-			free(sysData->transactions[sysData->transactionCount].createdAt);
-			free(sysData->transactions[sysData->transactionCount].updatedAt);
-			sleep(MID_SLEEP);
-			return;
-		}
 
-		sysData->transactionCount++;
-		saveTransactionData(sysData);
+		sysData->transactions[sysData->transactionCount].deletedAt = strdup(" ");
 	}
+
+	if (!sysData->transactions[sysData->transactionCount].deletedAt)
+	{
+		logAndFreeTransaction(sysData, sysData->transactionCount, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+		return;
+	}
+
+	sysData->transactionCount++;
+	saveTransactionData(sysData);
 	return;
 }
+
 void saveTransactionData(SystemData *sysData)
 {
 	if (sysData == NULL)
@@ -188,27 +165,21 @@ void loadTransactionData(SystemData *sysData)
 	double _fromCurrencyAmount, _toCurrencyAmount, _exchangeRate, _fromCurrencyRateToKz;
 	char _fromCurrencyCode[MAX_CURRENCY_CODE_LENGTH], _toCurrencyCode[MAX_CURRENCY_CODE_LENGTH], _createdAt[MAX_DATE_LENGTH], _updatedAt[MAX_DATE_LENGTH], _deletedAt[MAX_DATE_LENGTH];
 
-	// Adjusting transaction capacity if needed.
-	if (sysData->transactionCapacity == 0)
+	// Check if transaction capacity need adjustment [Verifique se a capacidade de transação precisa de ajuste]
+	if (sysData->transactionCount >= sysData->transactionCapacity)
 	{
-		sysData->transactionCapacity = 2;
+		size_t newCapacity = (sysData->transactionCapacity + 2) * 2;
+		TransactionInfo *tempTransactionSize = realloc(sysData->transactions, sizeof(TransactionInfo) * sysData->transactionCapacity);
+		if (!tempTransactionSize)
+		{
+			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			sleep(MID_SLEEP);
+			return;
+		}
+		sysData->transactions = tempTransactionSize;
+		sysData->transactionCapacity = newCapacity;
 	}
-	else
-	{
-		sysData->transactionCapacity = sysData->transactionCapacity;
-	}
-	// Reallocate memory to transactions structure
-	TransactionInfo *tempTransactionSize = realloc(sysData->transactions, sizeof(TransactionInfo) * sysData->transactionCapacity);
-	if (tempTransactionSize == NULL)
-	{
-		logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-		centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-		sleep(MID_SLEEP);
-		return;
-	}
-
-	// Assigning tempuTransactions to sysData->transactions
-	sysData->transactions = tempTransactionSize;
 
 	// Initializing syData->transactionCount to 0
 	sysData->transactionCount = 0;
@@ -218,9 +189,9 @@ void loadTransactionData(SystemData *sysData)
 		// check if transaction capacity need adjustment [Verifique se a capacidade de transação precisa de ajuste]
 		if (sysData->transactionCount >= sysData->transactionCapacity)
 		{
-			sysData->transactionCapacity = (sysData->transactionCapacity + 2) * 2;
-			tempTransactionSize = realloc(sysData->transactions, sizeof(TransactionInfo) * sysData->transactionCapacity);
-			if (tempTransactionSize == NULL)
+			size_t newCapacity = (sysData->transactionCapacity + 2) * 2;
+			TransactionInfo *tempTransactionSize = realloc(sysData->transactions, sizeof(TransactionInfo) * sysData->transactionCapacity);
+			if (!tempTransactionSize)
 			{
 				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 				centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
@@ -228,6 +199,7 @@ void loadTransactionData(SystemData *sysData)
 				return;
 			}
 			sysData->transactions = tempTransactionSize;
+			sysData->transactionCapacity = newCapacity;
 		}
 		// Add transaction data from file to transaction structure
 		sysData->transactions[sysData->transactionCount].transactionID = _transactionID;
@@ -240,72 +212,41 @@ void loadTransactionData(SystemData *sysData)
 		sysData->transactions[sysData->transactionCount].exchangeRate = _exchangeRate;
 		sysData->transactions[sysData->transactionCount].exchangeRateStatus = _exchangeRateStatus;
 		sysData->transactions[sysData->transactionCount].fromCurrencyCode = strdup(_fromCurrencyCode);
-		if (sysData->transactions[sysData->transactionCount].fromCurrencyCode == NULL)
+		if (!sysData->transactions[sysData->transactionCount].fromCurrencyCode)
 		{
-			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			sleep(MID_SLEEP);
+			logAndFreeTransaction(sysData, sysData->transactionCount, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 			return;
 		}
+
 		sysData->transactions[sysData->transactionCount].fromCurrencyRateToKz = _fromCurrencyRateToKz;
+
 		sysData->transactions[sysData->transactionCount].toCurrencyCode = strdup(_toCurrencyCode);
-		if (sysData->transactions[sysData->transactionCount].toCurrencyCode == NULL)
+		if (!sysData->transactions[sysData->transactionCount].toCurrencyCode)
 		{
-			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			free(sysData->transactions[sysData->transactionCount].fromCurrencyCode);
-			sleep(MID_SLEEP);
+			logAndFreeTransaction(sysData, sysData->transactionCount, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 			return;
 		}
 		sysData->transactions[sysData->transactionCount].transactionStatus = _transactionStatus;
+
 		sysData->transactions[sysData->transactionCount].createdAt = strdup(_createdAt);
-		if (sysData->transactions[sysData->transactionCount].createdAt == NULL)
+		if (!sysData->transactions[sysData->transactionCount].createdAt)
 		{
-			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			free(sysData->transactions[sysData->transactionCount].fromCurrencyCode);
-			free(sysData->transactions[sysData->transactionCount].toCurrencyCode);
-			sleep(MID_SLEEP);
+			logAndFreeTransaction(sysData, sysData->transactionCount, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 			return;
 		}
+
 		sysData->transactions[sysData->transactionCount].updatedAt = strdup(_updatedAt);
-		if (sysData->transactions[sysData->transactionCount].updatedAt == NULL)
+		if (!sysData->transactions[sysData->transactionCount].updatedAt)
 		{
-			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			free(sysData->transactions[sysData->transactionCount].fromCurrencyCode);
-			free(sysData->transactions[sysData->transactionCount].toCurrencyCode);
-			free(sysData->transactions[sysData->transactionCount].createdAt);
-			sleep(MID_SLEEP);
+			logAndFreeTransaction(sysData, sysData->transactionCount, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 			return;
 		}
 		sysData->transactions[sysData->transactionCount].deletedAt = strdup(_deletedAt);
-		if (sysData->transactions[sysData->transactionCount].deletedAt == NULL)
+
+		if (!sysData->transactions[sysData->transactionCount].deletedAt)
 		{
-			strcpy(_deletedAt, " ");
-			sysData->transactions[sysData->transactionCount].deletedAt = strdup(_deletedAt);
-			if (sysData->transactions[sysData->transactionCount].deletedAt == NULL)
-			{
-				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-				centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-				free(sysData->transactions[sysData->transactionCount].fromCurrencyCode);
-				free(sysData->transactions[sysData->transactionCount].toCurrencyCode);
-				free(sysData->transactions[sysData->transactionCount].createdAt);
-				free(sysData->transactions[sysData->transactionCount].updatedAt);
-				sleep(MID_SLEEP);
-				return;
-			}
-		}
-		else
-		{
-			sysData->transactions[sysData->transactionCount].deletedAt = strdup(_deletedAt);
-			if (sysData->transactions[sysData->transactionCount].deletedAt == NULL)
-			{
-				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-				centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-				sleep(MID_SLEEP);
-				return;
-			}
+			logAndFreeTransaction(sysData, sysData->transactionCount, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			return;
 		}
 		sysData->transactionCount++;
 	}
@@ -315,21 +256,33 @@ void loadTransactionData(SystemData *sysData)
 
 void freeTransactionData(SystemData *sysData)
 {
-	if (sysData == NULL)
+	if (sysData == NULL || sysData->transactions == NULL)
 	{
-		logMessages(LOG_ERROR, UI_ERROR_SYSTEM_DATA_IS_NULL);
-		centerStringOnly(UI_ERROR_SYSTEM_DATA_IS_NULL);
-		sleep(MID_SLEEP);
 		return;
 	}
 	for (size_t i = 0; i < sysData->transactionCount; i++)
 	{
-		free(sysData->transactions[i].fromCurrencyCode);
-		free(sysData->transactions[i].toCurrencyCode);
-		free(sysData->transactions[i].createdAt);
-		free(sysData->transactions[i].updatedAt);
-		free(sysData->transactions[i].deletedAt);
+		safefree(sysData->transactions[i].fromCurrencyCode);
+		safefree(sysData->transactions[i].toCurrencyCode);
+		safefree(sysData->transactions[i].createdAt);
+		safefree(sysData->transactions[i].updatedAt);
+		safefree(sysData->transactions[i].deletedAt);
 	}
 	free(sysData->transactions);
+	sysData->transactions = NULL;
+	sysData->transactionCount = 0;
+	sysData->transactionCapacity = 0;
 	return;
+}
+
+// Helper function for logging and freeing fields
+void logAndFreeTransaction(SystemData *sysData, size_t index, const char *message)
+{
+	logMessages(LOG_ERROR, message);
+	free(sysData->transactions[index].fromCurrencyCode);
+	free(sysData->transactions[index].toCurrencyCode);
+	free(sysData->transactions[index].createdAt);
+	free(sysData->transactions[index].updatedAt);
+	free(sysData->transactions[index].deletedAt);
+	sleep(MID_SLEEP);
 }

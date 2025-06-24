@@ -13,4 +13,7 @@ void loadCurrencyData(SystemData *sysData);
 
 // free currency data
 void freeCurrencyData(SystemData *sysData);
+
+// helper function for logging and freeing fields
+void logAndFreeCurrency(SystemData *sysData, size_t index, const char *message);
 #endif // CURRENCY_FUNCTIONS_H

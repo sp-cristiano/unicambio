@@ -25,6 +25,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <errno.h>
+#include <strings.h>
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
@@ -81,6 +82,12 @@
 #define FROM_CURRENCY_AMOUNT_USD 1.00
 #define DEFAULT_CURRENCY_ABBREVIATION_2 "AOA"
 
+#define safefree(ptr)                                       \
+	if ((ptr) && (ptr)[0] != '\0' && strcmp((ptr), " ") != 0) \
+	{                                                         \
+		free((ptr));                                            \
+		(ptr) = NULL;                                           \
+	}
 
 /**
  * @brief Default Curency code [Código de moeda padrão]

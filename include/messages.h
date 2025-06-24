@@ -27,8 +27,6 @@
 #define MESSAGES_H
 #include "../include/unicambio.h"
 
-
-
 // ====================================================================================================================================================================
 // SUCCESS MESSAGES [MENSAGENS DE SUCESSO]
 // ====================================================================================================================================================================
@@ -178,7 +176,7 @@
 
 /// Permissions [Permissões]
 #define UI_ERROR_USER_NO_PERMISSIONS "User Has No Permissions to perform this operation [Usuário não tem permissões para executar essa operação]"
-
+#define UI_ERROR_GETTING_CURRENT_DATE_TIME "Error getting current date time [Erro ao obter data e hora atual]"
 /// Misc [Miscelânea]
 #define UI_ERROR_HASHING_PASSWORD "Error hashing password [Erro ao hashear a senha]"
 #define UI_ERROR_UNAUTHORIZED_ACCESS "Unauthorized access [Acesso não autorizado]"
@@ -209,13 +207,21 @@
 #define UI_ERROR_USER_DATA_IS_EMPTY "User Data File is Empty [Arquivo de Dados de Usuário é vazio]"
 #define UI_ERROR_CURRENCY_DATA_IS_EMPTY "Currency Data File is Empty [Arquivo de Dados de Moeda é vazio]"
 #define UI_ERROR_EXCHANGE_RATE_DATA_IS_EMPTY "Exchange Rate Data File is Empty [Arquivo de Dados de Caâmbio é vazio]"
+#define UI_ERROR_TRANSACTION_DATA_IS_EMPTY "Transaction Data File is Empty [Arquivo de Dados de Transação é vazio]"
+#define UI_ERROR_ADMIN_USER_DATA_NOT_FOUND "Admin User Data Not Found [Dados de Usuário Administrador Não Encontrado]"
+#define UI_ERROR_ADMIN_USER_NAME_NOT_FOUND "Admin User Name Not Found [Nome de Usuário Administrador Não Encontrado]"
 
-#define UI_ERROR_USER_CAPACITY_REACHED
+#define UI_ERROR_SYSTEM_DATA_OR_USERS_IS_NULL "System Data or Users is Null [Dados do Sistema ou Usuários é nulo]"
+#define UI_ERROR_USER_CAPACITY_REACHED "User Capacity Reached [Capacidade de Usuário Alcancada]"
 #define UI_ERROR_TRANSACTION_DATA_IS_NULL "Transaction Data is Null [Dados de Transação é nulo]"
+#define UI_ERROR_ADMIN_USER_USERNAME_NOT_FOUND "Admin User Username Not Found [Nome de Usuário Administrador Não Encontrado]"
+#define UI_ERROR_ADMIN_USER_EMAIL_NOT_FOUND "Admin User Email Not Found [E-mail de Usuário Administrador Não Encontrado]"
 /// User Data [Dados de Usuário]
 #define UI_ERROR_USER_DATA_IS_NULL "User Data is Null [Dados de Usuário é nulo]"
+#define UI_ERROR_ADMIN_USER_PASSWORD_NOT_FOUND "Admin User Password Not Found [Senha de Usuário Administrador Não Encontrada]"
 #define UI_INFO_SYSTEM_FREEING_MEMORY "System is freeing memory [O Sistema está liberando memória]"
 #define UI_SUCCESSFUL_CREATED_FILE_DB "Database created successfully [Banco de dados criado com sucesso]"
+#define UI_ERROR_ADMIN_USER_PHONE_NOT_FOUND "Admin User Phone Not Found [Telefone de Usuário Administrador Não Encontrado]"
 #define UI_USER_ROLE_NOT_FOUND "User Role Not Found [Cargo de Usuário Não Encontrado]"
 #define UI_INCREASING_USER_CAPACITY "Increasing User Capacity [Aumentando Capacidade de Usuário]"
 #define UI_DECREASING_USER_CAPACITY "Decreasing User Capacity [Diminuindo Capacidade de Usuário]"

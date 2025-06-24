@@ -13,6 +13,8 @@
 #include "../include/structures.h"
 #include "../include/logger.h"
 #include "../include/homePageMenu.h"
+#include "../include/saveSystemData.h"
+#include "../include/freeSystemData.h"
 
 // convert to uppercase
 char *toUpperCase(const char *str)
@@ -279,6 +281,8 @@ void exitProgram(SystemData *sysData)
 		sysData->appContext->currentUserID = 0;				// Set the current user ID to 0[Definir o ID do usuário atual como 0]
 		sysData->appContext->currentUserRoleID = 0;		// Set the current user role ID to 0[Definir o ID do papel do usuário atual como 0]
 		sysData->appContext->currentUserName = NULL;	// Set the current user name to NULL[Definir o nome do usuário atual como NULL]
+		saveSystemData(sysData);
+		freeSystemData(sysData);
 
 		logMessages(LOG_INFO, UI_LABEL_EXIT); // Log the exit message
 		// printf("\n        %s\n", UI_LABEL_EXIT);
@@ -403,19 +407,42 @@ int getUserIDByMultipleSearch(SystemData *sysData, const char *multipleSearch)
 		return failed;
 	}
 	char *tempCharMultipleSearch = malloc(sizeof(char) * MAX_NAME_LENGTH);
-	tempCharMultipleSearch = strcpy(tempCharMultipleSearch, multipleSearch);
-
-	toUpperCase(tempCharMultipleSearch);
-
-	int tempIntMultipleSearch = atoi(tempCharMultipleSearch);
-
-	for (size_t i = 0; i < sysData->currencyCount; i++)
+	if (!tempCharMultipleSearch)
 	{
-		if (sysData->users[i].userID == tempIntMultipleSearch || strcmp(sysData->users[i].userName, tempCharMultipleSearch) == 0 || strcmp(sysData->users[i].email, tempCharMultipleSearch) == 0 || strcmp(sysData->users[i].phone, tempCharMultipleSearch) == 0)
+		logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+		centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+		return failed;
+
+		tempCharMultipleSearch = strncpy(tempCharMultipleSearch, multipleSearch, MAX_NAME_LENGTH - 1);
+
+		tempCharMultipleSearch[MAX_NAME_LENGTH - 1] = '\0';
+
+		if (strlen(tempCharMultipleSearch) == 0)
 		{
 			free(tempCharMultipleSearch);
-			return sysData->users[i].userID;
+			return failed;
+		}
+
+		toUpperCase(tempCharMultipleSearch);
+
+		int tempIntMultipleSearch = atoi(tempCharMultipleSearch);
+
+		for (size_t i = 0; i < sysData->userCount; i++)
+		{
+			if (
+					sysData->users[i].userID == tempIntMultipleSearch ||
+					(sysData->users[i].userName && strcasecmp(sysData->users[i].userName, tempCharMultipleSearch) == 0) ||
+					(sysData->users[i].email && strcasecmp(sysData->users[i].email, tempCharMultipleSearch) == 0) ||
+					(sysData->users[i].phone && strcmp(sysData->users[i].phone, tempCharMultipleSearch) == 0))
+			{
+				free(tempCharMultipleSearch);
+				return sysData->users[i].userID;
+			}
 		}
 	}
+	free(tempCharMultipleSearch);
+	logMessages(LOG_WARNING, UI_ERROR_USER_NOT_FOUND);
+	centerStringOnly(UI_ERROR_USER_NOT_FOUND);
+	sleep(MIN_SLEEP);
 	return failed;
 }

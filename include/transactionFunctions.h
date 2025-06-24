@@ -15,4 +15,6 @@ void loadTransactionData(SystemData *sysData);
 // Free Transaction
 void freeTransactionData(SystemData *sysData);
 
+// Helper function for logging and freeing fields
+void logAndFreeTransaction(SystemData *sysData, size_t index, const char *message);
 #endif // TRANSACTION_FUNCTIONS_H

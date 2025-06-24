@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -Iinclude -Wall -g -Wextra -std=c99 #-fsanitize=address
-LDFLAGS = -lsodium #-fsanitize=address
+CFLAGS = -Iinclude -Wall -g -Wextra -std=c99 -fsanitize=address -MMD -MP
+LDFLAGS = -lsodium -fsanitize=address
 
 # Find all .c source files [Procurar todos os arquivos .c]
 SRCS = $(wildcard src/*.c) $(wildcard src/defaultSetup/*.c) $(wildcard src/functions/*.c) $(wildcard src/functions/currencyFunctions/*.c) $(wildcard src/functions/exchangeRateFunctions/*.c) $(wildcard src/functions/menuFunctions/*.c) $(wildcard src/functions/oauthFunctions/*.c) $(wildcard src/functions/systemFunctions/*.c) $(wildcard src/functions/transactionFunctions/*.c) $(wildcard src/functions/userFunctions/*.c) $(wildcard src/functions/userFunctions/adminUserFunctions/*.c) $(wildcard src/functions/utilities/*.c)

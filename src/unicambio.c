@@ -38,17 +38,25 @@
 #include "structures.h"
 #include "initSystem.h"
 #include "messages.h"
-#include "createDB.h"
+// #include "createDB.h"
 #include "logger.h"
 #include "env.h"
 #include "utilities.h"
-#include "oauth.h"
+// #include "oauth.h"
 #include "initDefaultSetup.h"
 #include "homePageMenu.h"
 #include "saveSystemData.h"
 #include "loadSystemData.h"
+#include "transactionFunctions.h"
+#include "userFunctions.h"
+#include "currencyFunctions.h"
+#include "exchangeRateFunctions.h"
+#include "freeSystemData.h"
+
 int main()
 {
+	srand((unsigned int)time(NULL));
+
 	// Set the location of the application [Defina a localização da aplicação]
 	setLocation();
 
@@ -71,7 +79,7 @@ int main()
 	}
 
 	// Create database file for stroing system data [Crie um arquivo de banco de dados para armazenar dados do sistema]
-	createDB();
+	// createDB();
 
 	loadEnvFile(&sysData, ENV_FILE_PATH);
 
@@ -87,11 +95,19 @@ int main()
 	// Save system data to file [Salve dados do sistema no arquivo]
 	saveSystemData(&sysData);
 
-	// Add default Setups [Adicione perfis padrões]
-	// addDefaultSetups(&sysData);
-	printf("%s\n", sysData.appContext->ADMIN_USER_EMAIL);
-	printf("%s\n", sysData.appContext->ADMIN_USER_PASSWORD);
-	printf("%s\n", sysData.appContext->ADMIN_USER_PHONE);
+	freeSystemData(&sysData);
+
+	// // Add default Setups [Adicione perfis padrões]
+	// // addDefaultSetups(&sysData);
+	// printf("%s\n", sysData.appContext->ADMIN_USER_EMAIL);
+	// printf("%s\n", sysData.appContext->ADMIN_USER_PASSWORD);
+	// printf("%s\n", sysData.appContext->ADMIN_USER_PHONE);
+
+	// freeUserData(&sysData);
+	// freeCurrencyData(&sysData);
+	// freeExchangeRateData(&sysData);
+	// freeTransactionData(&sysData);
+	// freeAppContext(&sysData);
 
 	return successful;
 }

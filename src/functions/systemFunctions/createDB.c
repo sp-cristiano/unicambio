@@ -15,82 +15,83 @@ void createDB()
 
 void createUserDBFile()
 {
-	FILE *checkUserFile = fopen(USER_DATA_FILE_PATH, "r");
-	if (checkUserFile == NULL)
-	{
-		logMessages(LOG_WARNING, UI_ERROR_USER_DATA_FILE_NOT_FOUND);
-		centerStringOnly(UI_ERROR_USER_DATA_FILE_NOT_FOUND);
-		sleep(MID_SLEEP);
-		logMessages(LOG_INFO, UI_CREATING_USER_FILE);
-		centerStringOnly(UI_CREATING_USER_FILE);
-		sleep(MID_SLEEP);
+	// FILE *checkUserFile = fopen(USER_DATA_FILE_PATH, "r");
+	// if (checkUserFile == NULL)
+	// {
+	// 	logMessages(LOG_WARNING, UI_ERROR_USER_DATA_FILE_NOT_FOUND);
+	// 	centerStringOnly(UI_ERROR_USER_DATA_FILE_NOT_FOUND);
+	// 	sleep(MID_SLEEP);
+	// 	logMessages(LOG_INFO, UI_CREATING_USER_FILE);
+	// 	centerStringOnly(UI_CREATING_USER_FILE);
+	// 	sleep(MID_SLEEP);
 
-		FILE *userFile = fopen(USER_DATA_FILE_PATH, "w");
-		if (userFile == NULL)
-		{
-			logMessages(LOG_ERROR, UI_ERROR_CREATING_USER_DATA_FILE);
-			centerStringOnly(UI_ERROR_CREATING_USER_DATA_FILE);
-			sleep(MID_SLEEP);
-			return;
-		}
-		if (fclose(userFile) != 0)
-		{
-			logMessages(LOG_ERROR, UI_ERROR_CLOSING_USER_DATA_FILE);
-			centerStringOnly(UI_ERROR_CLOSING_USER_DATA_FILE);
-			sleep(MID_SLEEP);
-			return;
-		}
-	}
-	else
+	FILE *userFile = fopen(USER_DATA_FILE_PATH, "w");
+	if (userFile == NULL)
 	{
-		if (fclose(checkUserFile) != 0)
-		{
-			logMessages(LOG_ERROR, UI_ERROR_CLOSING_USER_DATA_FILE);
-			centerStringOnly(UI_ERROR_CLOSING_USER_DATA_FILE);
-			sleep(MID_SLEEP);
-			return;
-		}
+		logMessages(LOG_ERROR, UI_ERROR_CREATING_USER_DATA_FILE);
+		centerStringOnly(UI_ERROR_CREATING_USER_DATA_FILE);
+		sleep(MID_SLEEP);
+		return;
 	}
+	if (fclose(userFile) != 0)
+	{
+		logMessages(LOG_ERROR, UI_ERROR_CLOSING_USER_DATA_FILE);
+		centerStringOnly(UI_ERROR_CLOSING_USER_DATA_FILE);
+		sleep(MID_SLEEP);
+		return;
+	}
+	// // }
+	// else
+	// {
+	// 	if (fclose(checkUserFile) != 0)
+	// 	{
+	// 		logMessages(LOG_ERROR, UI_ERROR_CLOSING_USER_DATA_FILE);
+	// 		centerStringOnly(UI_ERROR_CLOSING_USER_DATA_FILE);
+	// 		sleep(MID_SLEEP);
+	// 		return;
+	// 	}
+	// }
 }
 
 void createCurrencyDBFile()
 {
-	FILE *checkCurrencyFile = fopen(CURRENCY_DATA_FILE_PATH, "r");
-	if (checkCurrencyFile == NULL)
-	{
-		logMessages(LOG_WARNING, UI_ERROR_CURRENCY_DATA_FILE_NOT_FOUND);
-		centerStringOnly(UI_ERROR_CURRENCY_DATA_FILE_NOT_FOUND);
-		sleep(MID_SLEEP);
-		logMessages(LOG_INFO, UI_CREATING_CURRENCY_FILE);
-		centerStringOnly(UI_CREATING_CURRENCY_FILE);
-		sleep(MID_SLEEP);
+	// FILE *checkCurrencyFile = fopen(CURRENCY_DATA_FILE_PATH, "r");
+	// if (checkCurrencyFile == NULL)
+	// {
+	// 	logMessages(LOG_WARNING, UI_ERROR_CURRENCY_DATA_FILE_NOT_FOUND);
+	// 	centerStringOnly(UI_ERROR_CURRENCY_DATA_FILE_NOT_FOUND);
+	// 	sleep(MID_SLEEP);
+	// 	logMessages(LOG_INFO, UI_CREATING_CURRENCY_FILE);
+	// 	centerStringOnly(UI_CREATING_CURRENCY_FILE);
+	// 	sleep(MID_SLEEP);
 
-		FILE *currencyFile = fopen("DB/currencies.txt", "w");
-		if (currencyFile == NULL)
-		{
-			logMessages(LOG_ERROR, UI_ERROR_CREATING_CURRENCY_DATA_FILE);
-			centerStringOnly(UI_ERROR_CREATING_CURRENCY_DATA_FILE);
-			sleep(MID_SLEEP);
-			return;
-		}
-		if (fclose(currencyFile) != 0)
-		{
-			logMessages(LOG_ERROR, UI_ERROR_CLOSING_CURRENCY_DATA_FILE);
-			centerStringOnly(UI_ERROR_CLOSING_CURRENCY_DATA_FILE);
-			sleep(MID_SLEEP);
-			return;
-		}
-	}
-	else
+	FILE *currencyFile = fopen("DB/currencies.txt", "w");
+	if (currencyFile == NULL)
 	{
-		if (fclose(checkCurrencyFile) != 0)
-		{
-			logMessages(LOG_ERROR, UI_ERROR_CLOSING_CURRENCY_DATA_FILE);
-			centerStringOnly(UI_ERROR_CLOSING_CURRENCY_DATA_FILE);
-			sleep(MID_SLEEP);
-			return;
-		}
+		logMessages(LOG_ERROR, UI_ERROR_CREATING_CURRENCY_DATA_FILE);
+		centerStringOnly(UI_ERROR_CREATING_CURRENCY_DATA_FILE);
+		sleep(MID_SLEEP);
+		return;
 	}
+	if (fclose(currencyFile) != 0)
+	{
+		logMessages(LOG_ERROR, UI_ERROR_CLOSING_CURRENCY_DATA_FILE);
+		centerStringOnly(UI_ERROR_CLOSING_CURRENCY_DATA_FILE);
+		sleep(MID_SLEEP);
+		return;
+	}
+
+	// }
+	// else
+	// {
+	// 	if (fclose(checkCurrencyFile) != 0)
+	// 	{
+	// 		logMessages(LOG_ERROR, UI_ERROR_CLOSING_CURRENCY_DATA_FILE);
+	// 		centerStringOnly(UI_ERROR_CLOSING_CURRENCY_DATA_FILE);
+	// 		sleep(MID_SLEEP);
+	// 		return;
+	// 	}
+	// }
 }
 
 void createExchangeRateDBFile()

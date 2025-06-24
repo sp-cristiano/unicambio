@@ -8,9 +8,10 @@
 #include "../include/exchangeRateDefaultSetup.h"
 #include "../include/transactionDefaultSetup.h"
 
-void initDefaultSetup(SystemData *sysData)
-{
+void initDefaultSetup(SystemData *sysData){
 	createUserDefaultSetup(sysData);
 	createCurrencyDefaultSetup(sysData);
 	createExchangeRateDefaultSetup(sysData);
+	// sleep(MAX_SLEEP);
+	return;
 }

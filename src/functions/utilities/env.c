@@ -70,7 +70,7 @@ static void removeComment(char *str)
 StatusInfo loadEnvFile(SystemData *sysData, const char *filePath)
 {
 	// Check if sysData or sysData->appContext is NULL[Verifique se sysData ou sysData->appContext é NULL]
-	if (!sysData)
+	if (!sysData || !sysData->appContext)
 	{
 		logMessages(LOG_ERROR, UI_ERROR_SYSTEM_DATA_OR_APP_CONTEXT_IS_NULL);
 		return failed;
@@ -82,36 +82,6 @@ StatusInfo loadEnvFile(SystemData *sysData, const char *filePath)
 		logMessages(LOG_ERROR, UI_ERROR_ENV_FILE_NOT_FOUND);
 		return failed;
 	}
-	// Clean up any existing context
-	if (sysData->appContext)
-	{
-		free(sysData->appContext->ADMIN_USER_EMAIL);
-		free(sysData->appContext->ADMIN_USER_PASSWORD);
-		free(sysData->appContext->ADMIN_USER_PHONE);
-		free(sysData->appContext);
-		sysData->appContext = NULL;
-	}
-
-	sysData->appContext = calloc(1, sizeof(AppContextInfo));
-
-	sysData->appContextCount = 0;
-	sysData->appContextCapacity = 0;
-	sysData->appContextLimit = 0;
-	sysData->appContext->exitFlag = false;
-	sysData->appContext->isAuthenticated = false;
-	sysData->appContext->loginAttempts = 0;
-	sysData->appContext->session = false;
-	sysData->appContext->goBack = false;
-	sysData->appContext->currentUserID = 0;
-	sysData->appContext->currentUserRoleID = 0;
-	sysData->appContext->currentUserName = NULL;
-
-	if (sysData->appContext == NULL)
-	{
-		logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-		return failed;
-	}
-
 	char line[MAX_LINE_LENGTH];
 
 	while (fgets(line, sizeof(line), envFile))
@@ -137,7 +107,8 @@ StatusInfo loadEnvFile(SystemData *sysData, const char *filePath)
 		{
 			free(sysData->appContext->ADMIN_USER_EMAIL);
 			sysData->appContext->ADMIN_USER_EMAIL = strdup(value);
-			if(sysData->appContext->ADMIN_USER_EMAIL == NULL){
+			if (sysData->appContext->ADMIN_USER_EMAIL == NULL)
+			{
 				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 				return failed;
 			}
@@ -146,7 +117,8 @@ StatusInfo loadEnvFile(SystemData *sysData, const char *filePath)
 		{
 			free(sysData->appContext->ADMIN_USER_PASSWORD);
 			sysData->appContext->ADMIN_USER_PASSWORD = strdup(value);
-			if(sysData->appContext->ADMIN_USER_PASSWORD == NULL){
+			if (sysData->appContext->ADMIN_USER_PASSWORD == NULL)
+			{
 				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 				return failed;
 			}
@@ -155,7 +127,8 @@ StatusInfo loadEnvFile(SystemData *sysData, const char *filePath)
 		{
 			free(sysData->appContext->ADMIN_USER_PHONE);
 			sysData->appContext->ADMIN_USER_PHONE = strdup(value);
-			if(sysData->appContext->ADMIN_USER_PHONE == NULL){
+			if (sysData->appContext->ADMIN_USER_PHONE == NULL)
+			{
 				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 				return failed;
 			}
@@ -163,5 +136,37 @@ StatusInfo loadEnvFile(SystemData *sysData, const char *filePath)
 	}
 	fclose(envFile);
 	sysData->appContextCount++;
+	sysData->appContextCapacity++;
 	return successful;
+}
+
+void freeAppContext(char *currentDate, char *currentTime, char *currentUserName, char *ADMIN_USER_PASSWORD, char *ADMIN_USER_EMAIL, char *ADMIN_USER_PHONE)
+{
+	free(currentDate);
+	free(currentTime);
+	free(currentUserName);
+	free(ADMIN_USER_PASSWORD);
+	free(ADMIN_USER_EMAIL);
+	free(ADMIN_USER_PHONE);
+}
+
+freeMemoryAllocatedToAppContextStructure(SystemData *sysData)
+{
+	if (sysData == NULL)
+	{
+		return;
+	}
+	for (size_t i = 0; i < sysData->appContextCount; i++)
+	{
+		free(sysData->appContext[i].currentDate);
+		free(sysData->appContext[i].currentTime);
+		free(sysData->appContext[i].currentUserName);
+		free(sysData->appContext[i].ADMIN_USER_PASSWORD);
+		free(sysData->appContext[i].ADMIN_USER_EMAIL);
+		free(sysData->appContext[i].ADMIN_USER_PHONE);
+	}
+	// free(sysData->appContext);
+	sysData->appContext = NULL;
+	sysData->appContextCount = 0;
+	sysData->appContextCapacity = 0;
 }

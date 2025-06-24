@@ -32,6 +32,23 @@ void homePageMenu(SystemData *sysData)
 		// printf("                   %s\n", UI_START_SESSION_MENU_OPT_1);
 		printf("\t1. Start Session [Iniciar Sessão]\n\n");
 		printf("\t0. Exit [Sair]\n\n");
+
+		printf("display user data\n");
+		for(size_t i = 0; i < sysData->userCount; i++){
+			printf("\t%s %s\n", sysData->users[i].name, sysData->users[i].email);
+		}
+		printf("Printing currency data\n");
+		for(size_t i = 0; i < sysData->currencyCount; i++){
+			printf("\t%s %lf\n", sysData->currencies[i].name, sysData->currencies[i].rateToOneKz);
+		}
+		printf("Printing exchange data\n");
+		for(size_t i = 0; i < sysData->exchangeRateCount; i++){
+			printf("\t%d %lf\n", sysData->exchangeRates[i].exchangeRateID, sysData->exchangeRates[i].toCurrencyAmountConvertedTo);
+		}
+		printf("Printing Transaction data\n");
+		for(size_t i = 0; i < sysData->transactionCount; i++){
+			printf("\t%d %lf\n", sysData->transactions[i].transactionID, sysData->transactions[i].toCurrencyAmount);
+		}
 		scanf("%d", &choice);
 		switch (choice)
 		{

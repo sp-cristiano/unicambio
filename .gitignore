@@ -64,4 +64,5 @@ currencies.txt
 exchangeRates.txt
 transactions.txt
 users.txt
-/obj/
+build/
+logs/

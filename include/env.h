@@ -25,5 +25,7 @@
  */
 
 StatusInfo loadEnvFile(SystemData *sysData, const char *filePath);
+void freeAppContext(char *currentDate, char *currentTime, char *currentUserName, char *ADMIN_USER_PASSWORD, char *ADMIN_USER_EMAIL, char *ADMIN_USER_PHONE);
+freeMemoryAllocatedToAppContextStructure(SystemData *sysData)
 
 #endif // ENV_H

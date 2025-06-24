@@ -10,59 +10,48 @@ void createExchangeRate(SystemData *sysData, int fromCurrencyID, double fromCurr
 {
 
 	// check if sysData pointer is valid [Verifique se o ponteiro sysData é válido]
-	if (sysData == NULL)
+	if (sysData == NULL || sysData->appContext == NULL)
 	{
 		logMessages(LOG_ERROR, UI_ERROR_SYSTEM_DATA_IS_NULL);
-		centerStringOnly(UI_ERROR_SYSTEM_DATA_IS_NULL);
 		sleep(MID_SLEEP);
 		return;
 	}
-	// check if sysData->appContext pointer is valid [Verifique se o ponteiro sysData->appContext é válido]
-	if (sysData->appContext == NULL)
-	{
-		logMessages(LOG_ERROR, UI_ERROR_APP_CONTEXT_IS_NULL);
-		centerStringOnly(UI_ERROR_APP_CONTEXT_IS_NULL);
-		sleep(MID_SLEEP);
-		return;
-	}
+
 	if (exchangeRateStatus == active)
 	{
 
 		// check if exchangeRate capacity need adjustment [Verifique se a capacidade de taxa de câmbio precisa de ajuste]
-		if (sysData->exchangeRateCapacity == 0)
+		if (sysData->exchangeRateCount >= sysData->exchangeRateCapacity)
 		{
-			sysData->exchangeRateCapacity = 2;
+			size_t newCapacity = (sysData->exchangeRateCapacity + 2) * 2;
+			ExchangeRateInfo *tempExchangeRateSize = realloc(sysData->exchangeRates, sizeof(ExchangeRateInfo) * newCapacity);
+			if (!tempExchangeRateSize)
+			{
+				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				sleep(MID_SLEEP);
+				return;
+			}
+			sysData->exchangeRates = tempExchangeRateSize;
+			sysData->exchangeRateCapacity = newCapacity;
 		}
-		else if (sysData->exchangeRateCount >= sysData->exchangeRateCapacity)
-		{
-			sysData->exchangeRateCapacity = (sysData->exchangeRateCapacity + 2) * 2;
-		}
-
-		// Reallocate Memory to the exchangeRate structure.
-		ExchangeRateInfo *tempExchangeRateSize = realloc(sysData->exchangeRates, sizeof(ExchangeRateInfo) * sysData->exchangeRateCapacity);
-		if (tempExchangeRateSize == NULL)
-		{
-			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			sleep(MID_SLEEP);
-			return;
-		}
-
-		sysData->exchangeRates = tempExchangeRateSize;
 
 		int exchangeRateID = randomNumber(60000, 80000);
 
 		// check if exchangeRateID already exists [Verifique se o ID da taxa de câmbio já existe]
-		for (size_t i = 0; i < sysData->exchangeRateCount; i++)
+		if (sysData->exchangeRates != NULL && sysData->exchangeRateCount > 0)
 		{
-			if (sysData->exchangeRates[i].exchangeRateID == exchangeRateID)
+			for (size_t i = 0; i < sysData->exchangeRateCount; i++)
 			{
-				exchangeRateID = randomNumber(60000, 80000);
-				i = -1;
+				if (sysData->exchangeRates[i].exchangeRateID == exchangeRateID)
+				{
+					exchangeRateID = randomNumber(60000, 80000);
+					i = 0;
+				}
 			}
 		}
-		// set current user id from appContext
-		int userID = sysData->appContext->currentUserID;
+
+		int userID;
 
 		// Get from currency Rate by from currency id
 		double fromCurrencyRate = getCurrencyRateToOneKzByID(sysData, fromCurrencyID);
@@ -95,52 +84,49 @@ void createExchangeRate(SystemData *sysData, int fromCurrencyID, double fromCurr
 		sysData->exchangeRates[sysData->exchangeRateCount].toCurrencyAmountConvertedTo = toCurrencyAmountConvertedTo;
 		sysData->exchangeRates[sysData->exchangeRateCount].toCurrencyRateToKz = toCurrencyRateToKz;
 		sysData->exchangeRates[sysData->exchangeRateCount].createdAt = strdup(createdAt);
-		if (sysData->exchangeRates[sysData->exchangeRateCount].createdAt == NULL)
+		if (!sysData->exchangeRates[sysData->exchangeRateCount].createdAt)
 		{
-			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			sleep(MID_SLEEP);
+			logAndFreeExchangeRate(sysData, sysData->exchangeRateCount, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 			return;
 		}
 
 		sysData->exchangeRates[sysData->exchangeRateCount].updatedAt = strdup(updatedAt);
-		if (sysData->exchangeRates[sysData->exchangeRateCount].updatedAt == NULL)
+		if (!sysData->exchangeRates[sysData->exchangeRateCount].updatedAt)
 		{
-			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			free(sysData->exchangeRates[sysData->exchangeRateCount].createdAt);
-			sleep(MID_SLEEP);
+			logAndFreeExchangeRate(sysData, sysData->exchangeRateCount, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 			return;
 		}
-		if (deletedAt == NULL)
+		if (deletedAt != NULL)
 		{
-			sysData->exchangeRates[sysData->exchangeRateCount].deletedAt = strdup(" ");
-			if (sysData->exchangeRates[sysData->exchangeRateCount].deletedAt == NULL)
-			{
-				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-				centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-				free(sysData->exchangeRates[sysData->exchangeRateCount].createdAt);
-				free(sysData->exchangeRates[sysData->exchangeRateCount].updatedAt);
-				sleep(MID_SLEEP);
-				return;
-			}
+			sysData->exchangeRates[sysData->exchangeRateCount].deletedAt = strdup(deletedAt);
 		}
 		else
 		{
-			sysData->exchangeRates[sysData->exchangeRateCount].deletedAt = strdup(deletedAt);
-			if (sysData->exchangeRates[sysData->exchangeRateCount].deletedAt == NULL)
-			{
-				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-				centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-				free(sysData->exchangeRates[sysData->exchangeRateCount].createdAt);
-				free(sysData->exchangeRates[sysData->exchangeRateCount].updatedAt);
-				sleep(MID_SLEEP);
-				return;
-			}
+			sysData->exchangeRates[sysData->exchangeRateCount].deletedAt = strdup(" ");
+		}
+		if (!sysData->exchangeRates[sysData->exchangeRateCount].deletedAt)
+		{
+			logAndFreeExchangeRate(sysData, sysData->exchangeRateCount, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			return;
 		}
 		// revert exchange rate from one kz
 		double exchangeRate = revertRateFromOneKz(toCurrencyRateToKz);
 		int transactionStatus = successful;
+
+		if (sysData->transactionCount >= sysData->transactionCapacity)
+		{
+			size_t newCapacity = (sysData->transactionCapacity + 2) * 2;
+			TransactionInfo *tempTransactionSize = realloc(sysData->transactions, sizeof(TransactionInfo) * newCapacity);
+			if (!tempTransactionSize)
+			{
+				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+				sleep(MID_SLEEP);
+				return;
+			}
+			sysData->transactions = tempTransactionSize;
+			sysData->transactionCapacity = newCapacity;
+		}
 
 		if (sysData->appContext->currentUserID == 0)
 		{
@@ -152,6 +138,8 @@ void createExchangeRate(SystemData *sysData, int fromCurrencyID, double fromCurr
 		}
 		else
 		{
+			userID = sysData->appContext->currentUserID;
+			createTransaction(sysData, exchangeRateID, userID, fromCurrencyID, fromCurrencyAmountToConvert, toCurrencyID, toCurrencyAmountConvertedTo, exchangeRate, exchangeRateStatus, fromCurrencyCode, fromCurrencyRateToKz, toCurrencyCode, transactionStatus, createdAt, updatedAt, deletedAt);
 
 			sysData->exchangeRateCount++;
 			saveExchangeRateData(sysData);
@@ -159,6 +147,7 @@ void createExchangeRate(SystemData *sysData, int fromCurrencyID, double fromCurr
 	}
 	else
 	{
+
 		logMessages(LOG_ERROR, UI_ERROR_EXCHANGE_RATE_DATA_IS_NULL);
 		centerStringOnly(UI_ERROR_EXCHANGE_RATE_DATA_IS_NULL);
 		sleep(MID_SLEEP);
@@ -220,37 +209,32 @@ void loadExchangeRateData(SystemData *sysData)
 	char _createdAt[MAX_DATE_LENGTH], _updatedAt[MAX_DATE_LENGTH], _deletedAt[MAX_DATE_LENGTH];
 
 	// Adjusting exchange capacity if needed.
-	if (sysData->exchangeRateCapacity == 0)
+	if (sysData->exchangeRateCount >= sysData->exchangeRateCapacity)
 	{
-		sysData->exchangeRateCapacity = 2;
+		size_t newCapacity = (sysData->exchangeRateCapacity + 2) * 2;
+		ExchangeRateInfo *tempExchangeRateSize = realloc(sysData->exchangeRates, sizeof(ExchangeRateInfo) * newCapacity);
+		if (!tempExchangeRateSize)
+		{
+			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			sleep(MID_SLEEP);
+			return;
+		}
+		sysData->exchangeRates = tempExchangeRateSize;
+		sysData->exchangeRateCapacity = newCapacity;
 	}
-	else if (sysData->exchangeRateCount >= sysData->exchangeRateCapacity)
-	{
-		sysData->exchangeRateCapacity = (sysData->exchangeRateCapacity + 2) * 2;
-	}
-
-	// Reallocate memory to exchange rate structure
-	ExchangeRateInfo *tempExchangeRateSize = realloc(sysData->exchangeRates, sizeof(ExchangeRateInfo) * sysData->exchangeRateCapacity);
-	if (tempExchangeRateSize == NULL)
-	{
-		logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-		centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-		sleep(MID_SLEEP);
-		return;
-	}
-	sysData->exchangeRates = tempExchangeRateSize;
 
 	// initializing sysData->exchangeRateCount to 0
 	sysData->exchangeRateCount = 0;
 
-	while (fscanf(exchangeRateFile, "%d|%d|%lf|%lf|%d|%d|%lf|%lf|%99[^|]|%99[^|]|%99[^|]\n)", &_exchangeRateID, &_fromCurrencyID, &_fromCurrencyAmountToConvert, &_fromCurrencyRateToKz, &toCurrencyID, &_exchangeRateStatus, &_toCurrencyAmountConvertedTo, &_toCurrencyRateToKz, _createdAt, _updatedAt, _deletedAt) != EOF && sysData->exchangeRateCount < sysData->exchangeRateCapacity)
+	while (fscanf(exchangeRateFile, "%d|%d|%lf|%lf|%d|%d|%lf|%lf|%99[^|]|%99[^|]|%99[^|]\n", &_exchangeRateID, &_fromCurrencyID, &_fromCurrencyAmountToConvert, &_fromCurrencyRateToKz, &toCurrencyID, &_exchangeRateStatus, &_toCurrencyAmountConvertedTo, &_toCurrencyRateToKz, _createdAt, _updatedAt, _deletedAt) != EOF && sysData->exchangeRateCount < sysData->exchangeRateCapacity)
 	{
 		// Check if exchangeCount exceeds exchangecapacity [Verifique se exchangeCount excede exchangecapacity]
 		if (sysData->exchangeRateCount >= sysData->exchangeRateCapacity)
 		{
-			sysData->exchangeRateCapacity = (sysData->exchangeRateCapacity + 2) * 2;
-			tempExchangeRateSize = realloc(sysData->exchangeRates, sizeof(ExchangeRateInfo) * sysData->exchangeRateCapacity);
-			if (tempExchangeRateSize == NULL)
+			size_t newCapacity = (sysData->exchangeRateCapacity + 2) * 2;
+			ExchangeRateInfo *tempExchangeRateSize = realloc(sysData->exchangeRates, sizeof(ExchangeRateInfo) * newCapacity);
+			if (!tempExchangeRateSize)
 			{
 				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 				centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
@@ -258,6 +242,7 @@ void loadExchangeRateData(SystemData *sysData)
 				return;
 			}
 			sysData->exchangeRates = tempExchangeRateSize;
+			sysData->exchangeRateCapacity = newCapacity;
 		}
 
 		// Add exchange rate data to database
@@ -270,55 +255,26 @@ void loadExchangeRateData(SystemData *sysData)
 		sysData->exchangeRates[sysData->exchangeRateCount].toCurrencyAmountConvertedTo = _toCurrencyAmountConvertedTo;
 		sysData->exchangeRates[sysData->exchangeRateCount].toCurrencyRateToKz = _toCurrencyRateToKz;
 		sysData->exchangeRates[sysData->exchangeRateCount].createdAt = strdup(_createdAt);
-		if (sysData->exchangeRates[sysData->exchangeRateCount].createdAt == NULL)
+		if (!sysData->exchangeRates[sysData->exchangeRateCount].createdAt)
 		{
-			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			sleep(MID_SLEEP);
+			logAndFreeExchangeRate(sysData, sysData->exchangeRateCount, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 			return;
 		}
+
 		sysData->exchangeRates[sysData->exchangeRateCount].updatedAt = strdup(_updatedAt);
-		if (sysData->exchangeRates[sysData->exchangeRateCount].updatedAt == NULL)
+		if (!sysData->exchangeRates[sysData->exchangeRateCount].updatedAt)
 		{
-			logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-			free(sysData->exchangeRates[sysData->exchangeRateCount].createdAt);
-			sleep(MID_SLEEP);
+			logAndFreeExchangeRate(sysData, sysData->exchangeRateCount, UI_ERROR_MEMORY_ALLOCATION_FAILED);
 			return;
 		}
 
 		sysData->exchangeRates[sysData->exchangeRateCount].deletedAt = strdup(_deletedAt);
 
-		if (sysData->exchangeRates[sysData->exchangeRateCount].deletedAt == NULL)
+		if (!sysData->exchangeRates[sysData->exchangeRateCount].deletedAt)
 		{
-			strcpy(_deletedAt, " ");
-			sysData->exchangeRates[sysData->exchangeRateCount].deletedAt = strdup(_deletedAt);
-			if (sysData->exchangeRates[sysData->exchangeRateCount].deletedAt == NULL)
-			{
-
-				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-				centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-				free(sysData->exchangeRates[sysData->exchangeRateCount].createdAt);
-				free(sysData->exchangeRates[sysData->exchangeRateCount].updatedAt);
-				sleep(MID_SLEEP);
-				return;
-			}
+			logAndFreeExchangeRate(sysData, sysData->exchangeRateCount, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+			return;
 		}
-		else
-		{
-			sysData->exchangeRates[sysData->exchangeRateCount].deletedAt = strdup(_deletedAt);
-			if (sysData->exchangeRates[sysData->exchangeRateCount].deletedAt == NULL)
-			{
-
-				logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
-				centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
-				free(sysData->exchangeRates[sysData->exchangeRateCount].createdAt);
-				free(sysData->exchangeRates[sysData->exchangeRateCount].updatedAt);
-				sleep(MID_SLEEP);
-				return;
-			}
-		}
-
 		sysData->exchangeRateCount++;
 	}
 	fclose(exchangeRateFile);
@@ -329,16 +285,26 @@ void freeExchangeRateData(SystemData *sysData)
 {
 	if (sysData == NULL)
 	{
-		logMessages(LOG_ERROR, UI_ERROR_SYSTEM_DATA_IS_NULL);
-		centerStringOnly(UI_ERROR_SYSTEM_DATA_IS_NULL);
-		sleep(MID_SLEEP);
 		return;
 	}
 	for (size_t i = 0; i < sysData->exchangeRateCount; i++)
 	{
-		free(sysData->exchangeRates[i].createdAt);
-		free(sysData->exchangeRates[i].updatedAt);
-		free(sysData->exchangeRates[i].deletedAt);
+		safefree(sysData->exchangeRates[i].createdAt);
+		safefree(sysData->exchangeRates[i].updatedAt);
+		safefree(sysData->exchangeRates[i].deletedAt);
 	}
 	free(sysData->exchangeRates);
+	sysData->exchangeRates = NULL;
+	sysData->exchangeRateCount = 0;
+	sysData->exchangeRateCapacity = 0;
+}
+
+// Helper function for logging and freeing fields
+void logAndFreeExchangeRate(SystemData *sysData, size_t index, const char *message)
+{
+	logMessages(LOG_ERROR, message);
+	free(sysData->exchangeRates[index].createdAt);
+	free(sysData->exchangeRates[index].updatedAt);
+	free(sysData->exchangeRates[index].deletedAt);
+	sleep(MID_SLEEP);
 }

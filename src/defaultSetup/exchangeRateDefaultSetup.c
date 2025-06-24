@@ -19,21 +19,44 @@ void createExchangeRateDefaultSetup(SystemData *sysData)
 	}
 	fclose(checkRateFile);
 
+	if (sysData->currencyCount == 0 || sysData->currencies == NULL)
+	{
+		logMessages(LOG_ERROR, UI_ERROR_CURRENCY_DATA_IS_NULL);
+		centerStringOnly(UI_ERROR_CURRENCY_DATA_IS_NULL);
+		sleep(MID_SLEEP);
+		return;
+	}
+
 	int fromCurrencyID, toCurrencyID, exchangeRateStatus;
 	double fromCurrencyAmountToConvert;
 
 	fromCurrencyID = getCurrencyID(sysData, "USD");
 	toCurrencyID = getCurrencyID(sysData, "AOA");
+	if (fromCurrencyID == -1 || toCurrencyID == -1)
+	{logMessages(LOG_WARNING, UI_ERROR_CURRENCY_NOT_FOUND);
+		centerStringOnly(UI_ERROR_CURRENCY_NOT_FOUND);
+		sleep(MID_SLEEP);
+		return;
+	}
 	exchangeRateStatus = active;
 	fromCurrencyAmountToConvert = FROM_CURRENCY_AMOUNT_USD;
 	char *createdAt = getCurrentDateTime(TYPE_DATE_TIME);
 	char *updatedAt = getCurrentDateTime(TYPE_DATE_TIME);
 	char *deletedAt = NULL;
 
-	createExchangeRate(sysData,fromCurrencyID, fromCurrencyAmountToConvert, exchangeRateStatus, toCurrencyID, createdAt, updatedAt, deletedAt);
+	if (createdAt == NULL || updatedAt == NULL)
+	{
+		logMessages(LOG_ERROR, UI_ERROR_MEMORY_ALLOCATION_FAILED);
+		centerStringOnly(UI_ERROR_MEMORY_ALLOCATION_FAILED);
+		free(createdAt);
+		free(updatedAt);
+		return;
+	}
 
+	createExchangeRate(sysData, fromCurrencyID, fromCurrencyAmountToConvert, exchangeRateStatus, toCurrencyID, createdAt, updatedAt, deletedAt);
 
-	free(getCurrentDateTime(TYPE_DATE_TIME));
+	free(createdAt);
+	free(updatedAt);
 	sleep(MID_SLEEP);
 	return;
 }

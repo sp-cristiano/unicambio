@@ -52,21 +52,26 @@ StatusInfo initSystem(SystemData *sysData)
 {
 	if (sysData == NULL)
 	{
-		fprintf(stderr, "%s\n", UI_ERROR_SYSTEM_DATA_IS_NULL);
+		logMessages(LOG_ERROR, UI_ERROR_SYSTEM_DATA_IS_NULL);
 		return failed;
 	}
-	sysData->appContext = NULL;
-	// sysData->appContextCount = 0;
-	// sysData->appContextCapacity = 0;
-	// sysData->appContextLimit = 0;
-	// sysData->appContext->exitFlag = false;
-	// sysData->appContext->isAuthenticated = false;
-	// sysData->appContext->loginAttempts = 0;
-	// sysData->appContext->session = false;
-	// sysData->appContext->goBack = false;
-	// sysData->appContext->currentUserID = 0;
-	// sysData->appContext->currentUserRoleID = 0;
-	// sysData->appContext->currentUserName = NULL;
+	sysData->appContext = calloc(1, sizeof(AppContextInfo));
+	if (!sysData->appContext)
+	{
+		logMessages(LOG_ERROR, UI_ERROR_SYSTEM_DATA_IS_NULL);
+		return failed;
+	}
+	sysData->appContextCount = 0;
+	sysData->appContextCapacity = 0;
+	sysData->appContextLimit = 0;
+	sysData->appContext->exitFlag = false;
+	sysData->appContext->isAuthenticated = false;
+	sysData->appContext->loginAttempts = 0;
+	sysData->appContext->session = false;
+	sysData->appContext->goBack = false;
+	sysData->appContext->currentUserID = 0;
+	sysData->appContext->currentUserRoleID = 0;
+	sysData->appContext->currentUserName = NULL;
 
 	sysData->users = NULL;
 	sysData->userCount = 0;
