@@ -14,5 +14,7 @@ char *getCurrentDateTime(int type);
 int randomNumber(int min, int max);
 void exitProgram(SystemData *sysData);
 void processing();
+int getUserIndexByID(SystemData *sysData, int userID);
+void logoutUser(SystemData *sysData);
 
 #endif // UTILITIES_H

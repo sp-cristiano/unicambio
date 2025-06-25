@@ -6,6 +6,7 @@
 #include "../include/freeSystemData.h"
 #include "../include/utilities.h"
 #include "../include/homePageMenu.h"
+#include "../include/auth.h"
 
 void centerStrings(char *string)
 {
@@ -18,6 +19,17 @@ void centerStrings(char *string)
 	printf("%s\n", string);
 	return;
 }
+// void alignTextTwentyPercentFromLeft(char *string)
+// {
+// 	int stringLength = strlen(string);
+// 	int spaces = (SCREEN_WIDTH - stringLength) / 2;
+// 	for (int i = 0; i < spaces; i++)
+// 	{
+// 		printf(" ");
+// 	}
+// 	printf("%s\n", string);
+// 	return;
+// }
 
 void alignTextRight(char *string)
 {
@@ -132,6 +144,41 @@ int randomNumber(int min, int max)
 		return rand_num; // Return the generated random number
 	}
 }
+void logoutUser(SystemData *sysData)
+{
+	char choice;
+	do
+	{
+		displayBanner();
+		centerStrings("Are you sure you want to logout(y/n)? [Deseja realmente sair (s/n)?]\n");
+		scanf(" %c", &choice);
+		if (choice != 'y' && choice != 'Y' && choice != 's' && choice != 'S' && choice != 'n' && choice != 'N')
+		{
+			logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
+			sleep(MID_SLEEP);
+		}
+	} while (choice != 'y' && choice != 'Y' && choice != 's' && choice != 'S' && choice != 'n' && choice != 'N');
+	if (choice == 'y' || choice == 'Y' || choice == 's' || choice == 'S')
+	{
+		logPrintMessage(LOG_INFO, "Logging out... [Deslogando...]", yes);
+		processing();
+		logPrintMessage(LOG_INFO, "Logout successful [Logout realizado com sucesso]", yes);
+		sysData->appContext->session = false;
+		sysData->appContext->isAuthenticated = false;
+		sysData->appContext->currentUserRoleID = 0;
+		sysData->appContext->currentUserID = 0;
+		sysData->appContext->exitFlag = false;
+		sysData->appContext->currentUserName = NULL;
+		
+		saveSystemData(sysData);
+
+		loginPageMenu(sysData);
+	}
+	else if (choice == 'n' || choice == 'N')
+	{
+		homePageMenu(sysData);
+	}
+}
 
 void exitProgram(SystemData *sysData)
 {
@@ -176,4 +223,16 @@ void processing()
 		// sleep(MIN_SLEEP);
 	}
 	printf("\n");
+}
+
+int getUserIndexByID(SystemData *sysData, int userID)
+{
+	for (size_t i = 0; i < sysData->userCount; i++)
+	{
+		if (sysData->users[i].userID == userID)
+		{
+			return i;
+		}
+	}
+	return -1;
 }
