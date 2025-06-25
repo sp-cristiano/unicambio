@@ -1,38 +1,29 @@
-
 #include "../include/freeSystemData.h"
 #include "../include/structures.h"
-#include "../include/userFunctions.h"
-#include "../include/currencyFunctions.h"
-#include "../include/exchangeRateFunctions.h"
-#include "../include/transactionFunctions.h"
+#include "../include/userFunction.h"
+#include "../include/enum.h"
+#include "../include/utilities.h"
 #include "../include/env.h"
+#include "../include/logger.h"
 
-void freeSystemData(SystemData *sysData)
+StatusInfo freeSystemData(SystemData *sysData)
 {
-	// Free all dynamically allocated memory
-	if (sysData->users != NULL)
+	if (!sysData)
 	{
-		freeMemoryAllocatedToUserStructure(sysData);
+		logPrintMessage(LOG_ERROR, "System data is Null. Failed to free system data [ Dados do sistema nulo. Falha ao liberar dados do sistema ]", yes);
+		return failed;
 	}
 
-	if (sysData->currencies != NULL)
+	if (freeMemoryAllocatedToUserStructure(sysData) != successful)
 	{
-		freeMemoryAllocatedToCurrencyStructure(sysData);
+		return failed;
 	}
-
-	if (sysData->exchangeRates != NULL)
+	if (freeMemoryAllocatedToAppContextStructure(sysData) != successful)
 	{
-		freeMemoryAllocatedToExchangeRateStructure(sysData);
+		return failed;
 	}
-
-	if (sysData->transactions != NULL)
-	{
-		freeMemoryAllocatedToTransactionStructure(sysData);
-	}
-
-	// Free appContext fields safely
-	if (sysData->appContext != NULL)
-	{
-		freeMemoryAllocatedToAppContextStructure(sysData);
-	}
+	// free(sysData);
+	sysData = NULL;
+	logPrintMessage(LOG_SUCCESS, "System data freed successfully [ Dados do sistema liberados com sucesso ]", yes);
+	return successful;
 }

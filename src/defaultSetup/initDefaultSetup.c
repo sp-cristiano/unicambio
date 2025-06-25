@@ -1,17 +1,35 @@
 #include "../include/unicambio.h"
-#include "../include/initDefaultSetup.h"
-#include "../include/messages.h"
-#include "../include/logger.h"
 #include "../include/structures.h"
+#include "../include/enum.h"
+#include "../include/initDefaultSetup.h"
 #include "../include/userDefaultSetup.h"
-#include "../include/currencyDefaultSetup.h"
-#include "../include/exchangeRateDefaultSetup.h"
-#include "../include/transactionDefaultSetup.h"
+#include "../include/utilities.h"
+#include "../include/env.h"
+#include "../include/logger.h"
 
-void initDefaultSetup(SystemData *sysData){
-	createUserDefaultSetup(sysData);
-	createCurrencyDefaultSetup(sysData);
-	createExchangeRateDefaultSetup(sysData);
-	// sleep(MAX_SLEEP);
-	return;
+StatusInfo initDefaultSetup(SystemData *sysData)
+{
+	StatusInfo status;
+	logPrintMessage(LOG_INFO, "Initializing default system setup [ Iniciando configuração padrão do sistema ]", yes);
+
+
+	processing();
+
+	if (loadEnvFile(sysData, ENV_FILE_PATH) != successful)
+	{
+		status = failed;
+		logPrintMessage(LOG_ERROR, "Failed to load environment file [ Falha ao carregar o arquivo de ambiente ]", yes);
+		return status;
+	}
+
+	processing();
+
+	if (createUserDefaultSetup(sysData) != successful)
+	{
+		status = failed;
+		logPrintMessage(LOG_ERROR, "Failed to create default user setup [ Falha ao criar configuração padrão do usuário ]", yes);
+		return status;
+	}
+	status = successful;
+	return status;
 }

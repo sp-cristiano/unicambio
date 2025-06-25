@@ -1,86 +1,117 @@
 #include "../include/unicambio.h"
-#include "../include/userDefaultSetup.h"
-#include "../include/messages.h"
-#include "../include/logger.h"
 #include "../include/structures.h"
+#include "../include/enum.h"
+#include "../include/logger.h"
 #include "../include/utilities.h"
-#include "../include/userFunctions.h"
+#include "../include/userDefaultSetup.h"
+#include "../include/userFunction.h"
 #include "../include/createDB.h"
 
-void createUserDefaultSetup(SystemData *sysData)
+StatusInfo createUserDefaultSetup(SystemData *sysData)
 {
+	StatusInfo status;
+
 	FILE *checkUserFile = fopen(USER_DATA_FILE_PATH, "r");
-	if (checkUserFile == NULL)
+	if (!checkUserFile)
 	{
-		logMessages(LOG_WARNING, UI_ERROR_USER_DATA_FILE_NOT_FOUND);
-		centerStringOnly(UI_ERROR_USER_DATA_FILE_NOT_FOUND);
+		logPrintMessage(LOG_WARNING, "User database file not found [ Arquivo de dados do usuário nao encontrado ]", yes);
+		logPrintMessage(LOG_INFO, "Creating user database file [ Criando arquivo de dados do usuário ]", yes);
+		sleep(MID_SLEEP);
 
-		// create db file
-		createUserDBFile();
+		processing();
 
-		if (!sysData->appContext->ADMIN_USER_EMAIL || !sysData->appContext->ADMIN_USER_PASSWORD || !sysData->appContext->ADMIN_USER_PHONE)
+		status = createUserDBFile();
+		if (status == failed)
 		{
-			logMessages(LOG_ERROR, "Admin default user data in app context is null [Dados do usuário administrador no contexto da aplicação é nulo]");
-			centerStringOnly("Admin default user data in app context is null [Dados do usuário administrador no contexto da aplicação é nulo]");
-			sleep(MID_SLEEP);
-			return;
+			logPrintMessage(LOG_ERROR, "Failed to create user database file [ Falha ao criar o arquivo de dados do usuário ]", yes);
+			return failed;
 		}
 
-		// allocate memory for default user data
-		char *name = (char *)malloc(strlen(MAX_NAME_LENGTH) * sizeof(char));
-		char *userName = (char *)malloc(strlen(MAX_NAME_LENGTH) * sizeof(char));
-		char *email = (char *)malloc(strlen(MAX_NAME_LENGTH) * sizeof(char));
-		char *password = (char *)malloc(strlen(MAX_PASSWORD_LENGTH) * sizeof(char));
-		char *phone = (char *)malloc(strlen(MAX_NAME_LENGTH) * sizeof(char));
-		char *createAt = (char *)malloc(strlen(MAX_DATE_LENGTH) * sizeof(char));
-		char *lastSeen = (char *)malloc(strlen(MAX_DATE_LENGTH) * sizeof(char));
-		char *deleteAt = (char *)malloc(strlen(MAX_DATE_LENGTH) * sizeof(char));
-
-		if (name == NULL || userName == NULL || email == NULL || password == NULL || phone == NULL || createAt == NULL || lastSeen == NULL || deleteAt == NULL)
+		if (!sysData->appContext->adminUserEmail || !sysData->appContext->adminUserPassword || !sysData->appContext->adminUserPhone)
 		{
-			logMessages(LOG_ERROR, "Memory allocation  for default user data failed [Erro alocando memória para os dados do usuário padrão]");
-			centerStringOnly("Memory allocation  for default user data failed [Erro alocando memória para os dados do usuário padrão]");
-			freeUserData(name, userName, email, password, phone, createAt, lastSeen, deleteAt);
-			sleep(MID_SLEEP);
-			return;
+			logPrintMessage(LOG_ERROR, "Admin default user data in app context is empty [ Dados padrão do usuário admin no contexto da aplicação estao vazios ]", yes);
+			status = failed;
+			return status;
 		}
 
-		// Initialize user data
+		char *name = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
+		char *username = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
+		char *email = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
+		char *password = (char *)malloc(MAX_PASSWORD_LENGTH * sizeof(char));
+		char *phone = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
+		char *dateCreated = (char *)malloc(MAX_DATE_LENGTH * sizeof(char));
+		char *lastUpdated = (char *)malloc(MAX_DATE_LENGTH * sizeof(char));
+		char *lastLogin = (char *)malloc(MAX_DATE_LENGTH * sizeof(char));
+		char *dateDeleted = (char *)malloc(MAX_DATE_LENGTH * sizeof(char));
+
+		if (name == NULL || username == NULL || email == NULL || password == NULL || phone == NULL || dateCreated == NULL || lastUpdated == NULL || lastLogin == NULL || dateDeleted == NULL)
+		{
+			logPrintMessage(LOG_ERROR, "Memory allocation for user default data failed [ Alocacao de memoria falhou para os dados padrão do usuário ]", yes);
+			freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
+			status = failed;
+			return status;
+		}
+
+		char *now = getCurrentDateTime(TYPE_DATE);
+
+		if (!now)
+		{
+			logPrintMessage(LOG_ERROR, "Failed to get current date and time [ Falha ao obter a data e hora atual ]", yes);
+			freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
+			free(now);
+			status = failed;
+			return status;
+		}
 		strncpy(name, DEFAULT_ADMIN_NAME, MAX_NAME_LENGTH - 1);
 		name[MAX_NAME_LENGTH - 1] = '\0';
 
-		strncpy(userName, DEFAULT_ADMIN_USERNAME, MAX_NAME_LENGTH - 1);
-		userName[MAX_NAME_LENGTH - 1] = '\0';
+		strncpy(username, DEFAULT_ADMIN_USERNAME, MAX_NAME_LENGTH - 1);
+		username[MAX_NAME_LENGTH - 1] = '\0';
 
-		strncpy(email, sysData->appContext->ADMIN_USER_EMAIL, MAX_NAME_LENGTH - 1);
+		strncpy(email, sysData->appContext->adminUserEmail, MAX_NAME_LENGTH - 1);
 		email[MAX_NAME_LENGTH - 1] = '\0';
 
-		strncpy(password, sysData->appContext->ADMIN_USER_PASSWORD, MAX_PASSWORD_LENGTH - 1);
+		strncpy(password, sysData->appContext->adminUserPassword, MAX_PASSWORD_LENGTH - 1);
 		password[MAX_PASSWORD_LENGTH - 1] = '\0';
 
-		strncpy(phone, sysData->appContext->ADMIN_USER_PHONE, MAX_NAME_LENGTH - 1);
+		strncpy(phone, sysData->appContext->adminUserPhone, MAX_NAME_LENGTH - 1);
 		phone[MAX_NAME_LENGTH - 1] = '\0';
 
-		int roleID = ROLE_ADMIN;
+		strncpy(dateCreated, now, MAX_DATE_LENGTH - 1);
+		dateCreated[MAX_DATE_LENGTH - 1] = '\0';
 
+		strncpy(lastUpdated, EMPTY_STRING, MAX_DATE_LENGTH - 1);
+		lastUpdated[MAX_DATE_LENGTH - 1] = '\0';
+
+		strncpy(lastLogin, EMPTY_STRING, MAX_DATE_LENGTH - 1);
+		lastLogin[MAX_DATE_LENGTH - 1] = '\0';
+
+		strncpy(dateDeleted, EMPTY_STRING, MAX_DATE_LENGTH - 1);
+
+		int roleID = ROLE_ADMIN;
 		int userStatus = active;
 
-		strncpy(createAt, getCurrentDateTime(TYPE_DATE_TIME), MAX_DATE_LENGTH - 1);
-		createAt[MAX_DATE_LENGTH - 1] = '\0';
+		status = createUser(sysData, name, username, email, password, phone, roleID, userStatus, dateCreated, lastUpdated, lastLogin, dateDeleted);
 
-		strncpy(lastSeen, getCurrentDateTime(TYPE_DATE_TIME), MAX_DATE_LENGTH - 1);
-		lastSeen[MAX_DATE_LENGTH - 1] = '\0';
+		freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
+		free(now);
 
-		strncpy(deleteAt, NULL, MAX_DATE_LENGTH - 1);
-		deleteAt[MAX_DATE_LENGTH - 1] = '\0';
-
-		createUser(sysData, name, userName, email, password, phone, roleID, userStatus, createAt, lastSeen, deleteAt);
-
-		freeUserData(name, userName, email, password, phone, createAt, lastSeen, deleteAt);
+		if (status != successful)
+		{
+			logPrintMessage(LOG_ERROR, "Failed to create user [ Falha ao criar o usuário ]", yes);
+			status = failed;
+			return status;
+		}
+		logPrintMessage(LOG_SUCCESS, "Default User created successfully [ Usuário criado com sucesso ]", yes);
+		status = successful;
+		return status;
 	}
 	else
 	{
-
+		logPrintMessage(LOG_INFO, "User database file found [ Arquivo de dados do usuário encontrado ]", yes);
+		status = successful;
 		fclose(checkUserFile);
+		return status;
 	}
+	return status;
 }

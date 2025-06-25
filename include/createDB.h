@@ -1,10 +1,8 @@
 #ifndef CREATE_DB_H
 #define CREATE_DB_H
 
-void createDB();
-void createUserDBFile();
-void createCurrencyDBFile();
-void createExchangeRateDBFile();
-void createTransactionDBFile();
+#include "../include/enum.h"
+
+StatusInfo createUserDBFile();
 
 #endif // CREATE_DB_H

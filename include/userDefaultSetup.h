@@ -1,7 +1,9 @@
-#ifndef ADMIN_USER_DEFAULT_SETUP_H
-#define ADMIN_USER_DEFAULT_SETUP_H
+#ifndef USER_DEFAULT_SETUP_H
+#define USER_DEFAULT_SETUP_H
+
 #include "../include/structures.h"
+#include "../include/enum.h"
 
-void createUserDefaultSetup(SystemData *sysData);
+StatusInfo createUserDefaultSetup(SystemData *sysData);
 
-#endif // ADMIN_USER_DEFAULT_SETUP_H
+#endif // USER_DEFAULT_SETUP_H

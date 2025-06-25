@@ -1,14 +1,8 @@
+#include "../include/unicambio.h"
 #include "../include/structures.h"
-#include "../include/userFunctions.h"
-#include "../include/currencyFunctions.h"
-#include "../include/exchangeRateFunctions.h"
-#include "../include/transactionFunctions.h"
-#include "../include/loadSystemData.h"
+#include "../include/enum.h"
+#include "../include/userFunction.h"
 void loadSystemData(SystemData *sysData)
 {
-
 	loadUserData(sysData);
-	loadCurrencyData(sysData);
-	loadExchangeRateData(sysData);
-	loadTransactionData(sysData);
 }

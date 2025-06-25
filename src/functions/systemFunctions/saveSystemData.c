@@ -1,13 +1,18 @@
 #include "../include/structures.h"
-#include "../include/userFunctions.h"
-#include "../include/currencyFunctions.h"
-#include "../include/exchangeRateFunctions.h"
-#include "../include/transactionFunctions.h"
+#include "../include/userFunction.h"
+#include "../include/enum.h"
 #include "../include/saveSystemData.h"
-void saveSystemData(SystemData *sysData)
+#include "../include/utilities.h"
+#include "../include/logger.h"
+
+StatusInfo saveSystemData(SystemData *sysData)
 {
-	saveUserData(sysData);
-	saveCurrencyData(sysData);
-	saveExchangeRateData(sysData);
-	saveTransactionData(sysData);
+	StatusInfo status;
+	if (saveUserData(sysData) != successful)
+	{
+		status = failed;
+		return status;
+	}
+	status = successful;
+	return status;
 }
