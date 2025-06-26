@@ -36,6 +36,19 @@ typedef struct
 
 typedef struct
 {
+	int currencyID;
+	char *name;
+	char *code;
+	char *symbol;
+	char *country;
+	int currencyStatus;
+	double rate;
+	char *dateCreated;
+	char *lastUpdated;
+	char *dateDeleted;
+} CurrencyInfo;
+typedef struct
+{
 	// app context
 	AppContextInfo *appContext;
 	size_t appContextCapacity;
@@ -48,6 +61,11 @@ typedef struct
 	size_t userCount;
 	size_t userLimit;
 
+	// currencies
+	CurrencyInfo *currencies;
+	size_t currencyCapacity;
+	size_t currencyCount;
+	size_t currencyLimit;
 	//
 } SystemData;
 

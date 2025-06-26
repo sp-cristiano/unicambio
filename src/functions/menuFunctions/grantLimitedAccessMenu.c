@@ -16,7 +16,7 @@ StatusInfo grantLimitedAccessMenu(SystemData *sysData)
 	{
 		do
 		{
-			displayBanner();
+			displayBanner(sysData);
 			centerStrings("RESTRICTED USER MENU [MENU DO USUARIO RESTRITO]");
 			printf("\n");
 			centerStrings("Select option from  1 to 2 to navigate this menu. Select 0 to Logout.\n");

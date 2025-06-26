@@ -61,7 +61,7 @@ StatusInfo loginPageMenu(SystemData *sysData)
 		{
 			while (loginAttempts < MAX_LOGIN_ATTEMPTS && isAuthenticated == false)
 			{
-				displayBanner();
+				displayBanner(sysData);
 				if (isAuthenticated == false)
 				{
 					printf("\n\t\t\t\t\t\tMaximum Trials [Máximo de tentativas]: %d\n", MAX_LOGIN_ATTEMPTS);
@@ -114,7 +114,7 @@ StatusInfo loginPageMenu(SystemData *sysData)
 			{
 				if (loginAttempts >= MAX_LOGIN_ATTEMPTS)
 				{
-					displayBanner();
+					displayBanner(sysData);
 					logPrintMessage(LOG_ERROR, "Maximum login attempts reached [Limite de tentativas de login alcancado]", yes);
 					logPrintMessage(LOG_ERROR, "[Limite de tentativas de login alcancado]", yes);
 					exitFlag = true;
@@ -166,12 +166,12 @@ int authenticateUser(SystemData *sysData, char *username, char *password)
 				logPrintMessage(LOG_SUCCESS, "User authenticated successfully [ Usuário autenticado com sucesso ]", yes);
 				return sysData->appContext->isAuthenticated;
 			}
-			else
-			{
-				logPrintMessage(LOG_ERROR, "Password is incorrect [ Senha incorreta ]", yes);
-				sysData->appContext->isAuthenticated = false;
-				return sysData->appContext->isAuthenticated;
-			}
+			// else
+			// {
+			// 	logPrintMessage(LOG_ERROR, "Password is incorrect [ Senha incorreta ]", yes);
+			// 	sysData->appContext->isAuthenticated = false;
+			// 	return sysData->appContext->isAuthenticated;
+			// }
 		}
 		else if (passwordIsVerified == true)
 		{
@@ -179,17 +179,18 @@ int authenticateUser(SystemData *sysData, char *username, char *password)
 			sysData->appContext->isAuthenticated = false;
 			return sysData->appContext->isAuthenticated;
 		}
-		else
-		{
-			logPrintMessage(LOG_ERROR, "Invalid Credentials [Credenciais inválidas]", yes);
-		}
+		// else
+		// {
+		// 	logPrintMessage(LOG_ERROR, "Invalid Credentials [Credenciais inválidas]", yes);
+		// }
 	}
+	logPrintMessage(LOG_ERROR, "Invalid Credentials [Credenciais inválidas]", yes);
 	return sysData->appContext->isAuthenticated;
 }
 
 StatusInfo grantLoginAccess(SystemData *sysData, int userID)
 {
-	displayBanner();
+	displayBanner(sysData);
 	if (!sysData)
 	{
 		logPrintMessage(LOG_ERROR, "Failed to access system data [ Falha ao acessar os dados do sistema ]", yes);
@@ -209,7 +210,7 @@ StatusInfo grantLoginAccess(SystemData *sysData, int userID)
 	int userRole = sysData->appContext->currentUserRoleID;
 
 	size_t userIndex = getUserIndexByID(sysData, userID);
-	if (userIndex < 0)
+	if (userIndex < (size_t) 0)
 	{
 		logPrintMessage(LOG_ERROR, "Invalid user ID [ID de usuário inválido]", yes);
 		return failed;

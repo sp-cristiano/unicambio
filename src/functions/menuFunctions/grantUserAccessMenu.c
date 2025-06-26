@@ -15,7 +15,7 @@ StatusInfo grantUserAccessMenu(SystemData *sysData)
 	{
 		do
 		{
-			displayBanner();
+			displayBanner(sysData);
 			centerStrings("USER MENU [MENU DO USUARIO]");
 			printf("\n");
 			centerStrings("Select option from  1 to 4 to navigate this menu. Select 0 to Logout.\n");

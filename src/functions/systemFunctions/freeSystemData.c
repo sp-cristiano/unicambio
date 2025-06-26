@@ -22,7 +22,21 @@ StatusInfo freeSystemData(SystemData *sysData)
 	{
 		return failed;
 	}
-	// free(sysData);
+	if (freeMemoryAllocatedToCurrencyStructure(sysData) != successful)
+	{
+		return failed;
+	}
+
+	// TODO: free memory allocated to exchange rate
+	// if (freeMemoryAllocatedToExchangeRateStructure(sysData) != successful)
+	// {
+	// 	return failed;
+	// }
+	// if (freeMemoryAllocatedToTransactionStructure(sysData) != successful)
+	// {
+	// 	return failed;
+	// }
+
 	sysData = NULL;
 	logPrintMessage(LOG_SUCCESS, "System data freed successfully [ Dados do sistema liberados com sucesso ]", yes);
 	return successful;

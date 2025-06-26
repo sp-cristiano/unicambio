@@ -42,6 +42,11 @@ StatusInfo initSystem(SystemData *sysData)
 	sysData->userCapacity = 0;
 	sysData->userLimit = 0;
 
+	sysData->currencies = NULL;
+	sysData->currencyCount = 0;
+	sysData->currencyCapacity = 0;
+	sysData->currencyLimit = 0;
+
 	status = successful;
 
 	return status;

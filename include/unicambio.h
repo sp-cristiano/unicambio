@@ -11,12 +11,13 @@
 #include <stddef.h>
 #include <ctype.h>
 #include <errno.h>
-#include <strings.h>
 
 // Platform detection
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
+#define strcasecmp _stricmp
 #else
+#include <strings.h>
 #include <unistd.h>
 #endif
 
@@ -46,6 +47,8 @@
 #define MAX_NAME_LENGTH 150
 #define MAX_PASSWORD_LENGTH 300
 #define MAX_DATE_LENGTH 100
+#define DEFAULT_USD_RATE 939.317
+#define DEFAULT_KZ_RATE 1.00
 
 // Date formats
 #define DATE_FORMAT "%d-%m-%Y"

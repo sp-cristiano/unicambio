@@ -4,5 +4,8 @@
 #include "../include/enum.h"
 
 StatusInfo createUserDBFile();
+StatusInfo createCurrencyDBFile();
+// StatusInfo createExchangeRateDBFile();
+// StatusInfo createTransactionDBFile();
 
 #endif // CREATE_DB_H

@@ -7,7 +7,7 @@
 void centerStrings(char *string);
 void alignTextRight(char *string);
 void printSymbols(int quantity, char symbol);
-void displayBanner();
+void displayBanner(SystemData *sysData);
 void clearScreen();
 StatusInfo setLocation();
 char *getCurrentDateTime(int type);
@@ -17,5 +17,11 @@ void processing();
 int getUserIndexByID(SystemData *sysData, int userID);
 void logoutUser(SystemData *sysData);
 void clearInputBuffer();
+int getUserIDByMultipleSearch(SystemData *sysData, char *multiSearch);
+StatusInfo viewSingleUser(SystemData *sysData, size_t userIndex);
+void selectOptionToUpdateUserByAdmin(SystemData *sysData, size_t userIndex);
+double convertRateToOneKz(double rate);
+double convertRateFromOneKz(double rateToOneKz);
+double getCurrencyRateToOneKz(SystemData *sysData, int currencyID);
 
 #endif // UTILITIES_H

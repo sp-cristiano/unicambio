@@ -17,7 +17,7 @@ StatusInfo grantAdminAccessMenu(SystemData *sysData)
 	{
 		do
 		{
-			displayBanner();
+			displayBanner(sysData);
 			centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]");
 			printf("\n");
 			centerStrings("Select option from  1 to 4 to navigate this menu. Select 0 to Logout.\n");
@@ -65,7 +65,7 @@ StatusInfo performUserOperationsMenu(SystemData *sysData)
 	StatusInfo status;
 	do
 	{
-		displayBanner();
+		displayBanner(sysData);
 		centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]\n");
 		centerStrings("USER OPERATIONS MENU [MENU DE OPERAÇÕES DE USUARIO]");
 		printf("\n");
@@ -117,7 +117,7 @@ StatusInfo createUserMenu(SystemData *sysData)
 	StatusInfo created = failed;
 	do
 	{
-		displayBanner();
+		displayBanner(sysData);
 		centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]\n");
 		centerStrings("CREATE USER MENU [MENU DE CRIAR USUARIO]");
 		printf("\n");
@@ -162,7 +162,7 @@ StatusInfo createUserMenu(SystemData *sysData)
 		while (choice < 0 || choice > 2)
 		{
 			clearInputBuffer();
-			displayBanner();
+			displayBanner(sysData);
 			centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]\n");
 			centerStrings("CREATE USER MENU [MENU DE CRIAR USUARIO]");
 			printf("\n");
@@ -193,7 +193,7 @@ StatusInfo createUserMenu(SystemData *sysData)
 			}
 		}
 		clearInputBuffer();
-		displayBanner();
+		displayBanner(sysData);
 		printf("Enter user name [Digite o nome do usuário]: ");
 		scanf("%149[^\n]", name);
 		while (strlen(name) <= 0 || (name[0] == '0' && strlen(name) == 1))
@@ -213,7 +213,7 @@ StatusInfo createUserMenu(SystemData *sysData)
 				}
 				free(name);
 				clearInputBuffer();
-				displayBanner();
+				displayBanner(sysData);
 				name = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
 				printf("Enter user name [Digite o nome do usuário]: ");
 				scanf("%149[^\n]", name);
@@ -221,7 +221,7 @@ StatusInfo createUserMenu(SystemData *sysData)
 		}
 
 		clearInputBuffer();
-		displayBanner();
+		displayBanner(sysData);
 		printf("Enter user username [Digite o username do usuário]: ");
 		scanf("%s", username);
 		while (strlen(username) <= 0 || (username[0] == '0' && strlen(username) == 1))
@@ -241,7 +241,7 @@ StatusInfo createUserMenu(SystemData *sysData)
 				}
 				free(username);
 				clearInputBuffer();
-				displayBanner();
+				displayBanner(sysData);
 				username = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
 				printf("Enter user username [Digite o username do usuário]: ");
 				scanf("%s", username);
@@ -249,7 +249,7 @@ StatusInfo createUserMenu(SystemData *sysData)
 		}
 
 		clearInputBuffer();
-		displayBanner();
+		displayBanner(sysData);
 		printf("Enter user email [Digite o email do usuário]: ");
 		scanf("%s", email);
 		while (strlen(email) <= 0 || (email[0] == '0' && strlen(email) == 1))
@@ -269,7 +269,7 @@ StatusInfo createUserMenu(SystemData *sysData)
 				}
 				free(email);
 				clearInputBuffer();
-				displayBanner();
+				displayBanner(sysData);
 				email = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
 				printf("Enter user email [Digite o email do usuário]: ");
 				scanf("%s", email);
@@ -277,7 +277,7 @@ StatusInfo createUserMenu(SystemData *sysData)
 		}
 
 		clearInputBuffer();
-		displayBanner();
+		displayBanner(sysData);
 		printf("Enter user password [Digite a senha do usuário]: ");
 		scanf("%s", password);
 		while (strlen(password) <= 0 || (password[0] == '0' && strlen(password) == 1))
@@ -297,7 +297,7 @@ StatusInfo createUserMenu(SystemData *sysData)
 				}
 				free(password);
 				clearInputBuffer();
-				displayBanner();
+				displayBanner(sysData);
 				password = (char *)malloc(MAX_PASSWORD_LENGTH * sizeof(char));
 				printf("Enter user password [Digite a senha do usuário]: ");
 				scanf("%s", password);
@@ -305,7 +305,7 @@ StatusInfo createUserMenu(SystemData *sysData)
 		}
 
 		clearInputBuffer();
-		displayBanner();
+		displayBanner(sysData);
 		printf("Enter user phone [Digite o telefone do usuário]: ");
 		scanf("%s", phone);
 		while (strlen(phone) <= 0 || (phone[0] == '0' && strlen(phone) == 1))
@@ -325,7 +325,7 @@ StatusInfo createUserMenu(SystemData *sysData)
 				}
 				free(phone);
 				clearInputBuffer();
-				displayBanner();
+				displayBanner(sysData);
 				phone = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
 				printf("Enter user phone [Digite o telefone do usuário]: ");
 				scanf("%s", phone);
@@ -363,11 +363,219 @@ StatusInfo createUserMenu(SystemData *sysData)
 
 StatusInfo updateUserProfileMenu(SystemData *sysData)
 {
-	StatusInfo status;
+	int currentUserRoleID = sysData->appContext->currentUserRoleID, searchedID;
+	char questionToUpdate;
+	size_t userIndex;
+
+	StatusInfo status, updated = failed;
+	// char *searchCriteria = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
+	int searchCriteria;
+	int choice;
+	if (currentUserRoleID == ROLE_ADMIN)
+	{
+		do
+		{
+			displayBanner(sysData);
+			centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]\n");
+			centerStrings("UPDATE USER PROFILE [ATUALIZAR PERFIL DE USUARIO]");
+			printf("\n");
+			centerStrings("Enter the user ID of the user you want to update. Enter 0 to go back.\n");
+			centerStrings("Digite o ID do usuário que deseja atualizar. Digite 0 para voltar.\n");
+			printf("\n");
+			printf("\n");
+			printf("S/N   ID [ID]     NAME [NOME]\n");
+			for (size_t i = 0; i < sysData->userCount; i++)
+			{
+				printf("%ld     %d        %s\n", (i + 1), sysData->users[i].userID, sysData->users[i].name);
+			}
+			// clearInputBuffer();
+			printf("\n");
+			printf("Enter user ID [Digite ID do usuário]: ");
+			scanf("%d", &choice);
+
+			if (choice == 0)
+			{
+				performUserOperationsMenu(sysData);
+			}
+			userIndex = (size_t)getUserIndexByID(sysData, choice); // getUserIndexByID()
+
+			if (userIndex >= (size_t)0 && userIndex < sysData->userCount)
+			{
+				do
+				{
+					// clearInputBuffer();
+					displayBanner(sysData);
+					centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]\n");
+					centerStrings("UPDATE USER PROFILE [ATUALIZAR PERFIL DE USUARIO]");
+					printf("\n");
+					viewSingleUser(sysData, userIndex);
+					centerStrings("\n\n Do you still want to update this user data? (y/n)");
+					centerStrings("\nVocê ainda deseja atualizar os dados deste usuário? (s/n)");
+					// clearInputBuffer();
+					scanf(" %c", &questionToUpdate);
+					if (questionToUpdate != 'y' && questionToUpdate != 'Y' && questionToUpdate != 's' && questionToUpdate != 'S' && questionToUpdate != 'n' && questionToUpdate != 'N')
+					{
+						logPrintMessage(LOG_WARNING, "Invalid Input [Entrada Invalida]", yes);
+					}
+
+				} while (questionToUpdate != 'y' && questionToUpdate != 'Y' && questionToUpdate != 's' && questionToUpdate != 'S' && questionToUpdate != 'n' && questionToUpdate != 'N');
+
+				if (questionToUpdate == 'y' || questionToUpdate == 'Y' || questionToUpdate == 's' || questionToUpdate == 'S')
+				{
+					int choice;
+					do
+					{
+						displayBanner(sysData);
+
+						char *now = getCurrentDateTime(TYPE_DATETIME);
+						centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]\n");
+
+						selectOptionToUpdateUserByAdmin(sysData, userIndex);
+
+						printf("\n");
+						printf("Enter your choice [Digite sua opção]: ");
+						clearInputBuffer();
+						scanf("%d", &choice);
+						switch (choice)
+						{
+						case 0:
+							// free(name);
+							// free(username);
+							// free(email);
+							// free(password);
+							// free(phone);
+							// free(now);
+							status = performUserOperationsMenu(sysData);
+							// free(now);
+
+							updated = failed;
+							break;
+						case 1:
+							char *name = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
+
+							printf("User Name to update %s [Nome de usuário para atualizar %s]\n", sysData->users[userIndex].name, sysData->users[userIndex].name);
+							printf("Enter New User Name [Digite o novo nome do usuário]: ");
+							// clearInputBuffer();
+							scanf("%149[^\n]", name);
+							strcpy(sysData->users[userIndex].name, name);
+							strcpy(sysData->users[userIndex].lastUpdated, now);
+							updated = saveSystemData(sysData);
+							// free(name);
+							// free(now);
+							viewSingleUser(sysData, userIndex);
+							break;
+						case 2:
+							char *username = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
+							printf("User Username to update %s [Username de usuário para atualizar %s]\n", sysData->users[userIndex].username, sysData->users[userIndex].username);
+							printf("Enter New User Username [Digite o novo username do usuário]: ");
+							// clearInputBuffer();
+							scanf("%s", username);
+							strcpy(sysData->users[userIndex].username, username);
+							strcpy(sysData->users[userIndex].lastUpdated, now);
+							updated = saveSystemData(sysData);
+							// free(username);
+							// free(now);
+							viewSingleUser(sysData, userIndex);
+							break;
+						case 3:
+							char *email = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
+							printf("User Email to update %s [Email de usuário para atualizar %s]\n", sysData->users[userIndex].email, sysData->users[userIndex].email);
+							printf("Enter New User Email [Digite o novo email do usuário]: ");
+							// clearInputBuffer();
+							scanf("%s", email);
+							strcpy(sysData->users[userIndex].email, email);
+							strcpy(sysData->users[userIndex].lastUpdated, now);
+							updated = saveSystemData(sysData);
+							// free(email);
+							// free(now);
+							viewSingleUser(sysData, userIndex);
+							break;
+						case 4:
+							char *password = (char *)malloc(MAX_PASSWORD_LENGTH * sizeof(char));
+
+							printf("User Password to update %s [Senha de usuário para atualizar %s]\n", sysData->users[userIndex].password, sysData->users[userIndex].password);
+							if (!password)
+							{
+								logPrintMessage(LOG_ERROR, "Failed to allocate memory for password update [Falha ao alocar memória]", yes);
+								free(password);
+								return failed;
+							}
+
+							printf("Enter New User Password [Digite a nova senha do usuário]: ");
+							clearInputBuffer();
+							scanf("%s", password);
+							char *hashedPWD = hashPassword(password);
+							strcpy(sysData->users[userIndex].password, hashedPWD);
+							strcpy(sysData->users[userIndex].lastUpdated, now);
+							updated = saveSystemData(sysData);
+							// free(hashedPWD);
+							// free(password);
+							// free(now);
+
+							viewSingleUser(sysData, userIndex);
+
+							break;
+						case 5:
+							printf("User Phone to update %s [Telefone de usuário para atualizar %s]\n", sysData->users[userIndex].phone, sysData->users[userIndex].phone);
+							printf("Enter New User Phone [Digite o novo telefone do usuário]: ");
+							// clearInputBuffer();
+							char *phone = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
+							scanf("%s", phone);
+							strcpy(sysData->users[userIndex].phone, phone);
+							strcpy(sysData->users[userIndex].lastUpdated, now);
+							updated = saveSystemData(sysData);
+							// free(phone);
+							// free(now);
+							viewSingleUser(sysData, userIndex);
+							break;
+						case 6:
+							printf("User Role to update %d [Papel de usuário para atualizar %d]\n", sysData->users[userIndex].roleID, sysData->users[userIndex].roleID);
+							clearInputBuffer();
+							printf("Enter New User Role [Digite o novo papel do usuário]: ");
+							scanf("%d", &sysData->users[userIndex].roleID);
+							sysData->users[userIndex].lastUpdated = now;
+							updated = saveSystemData(sysData);
+							// free(now);
+							viewSingleUser(sysData, userIndex);
+							break;
+						case 7:
+							printf("User Status to update %d [Status de usuário para atualizar %d]\n", sysData->users[userIndex].userStatus, sysData->users[userIndex].userStatus);
+							printf("Enter New User Status [Digite o novo status do usuário]: ");
+							scanf("%d", &sysData->users[userIndex].userStatus);
+							sysData->users[userIndex].lastUpdated = now;
+							updated = saveSystemData(sysData);
+							// free(now);
+							viewSingleUser(sysData, userIndex);
+							break;
+						default:
+							logPrintMessage(LOG_WARNING, "Invalid Input [Entrada Invalida]", yes);
+							updated = failed;
+							// free(now);
+							break;
+						}
+						free(now);
+					} while ((choice < 0 || choice > 7));
+				}
+				else if (questionToUpdate == 'n' || questionToUpdate == 'N')
+				{
+					status = performUserOperationsMenu(sysData);
+					updated = failed;
+				}
+			}
+
+		} while (updated == failed && sysData->appContext->session == true && sysData->appContext->isAuthenticated == true && sysData->appContext->exitFlag == false);
+	
+	}
+	else
+	{
+		// TODO UPDATE FUNCTIONS FOR NON ADMIN
+	}
+	// free(searchCriteria);
 	return status;
 }
 StatusInfo viewAllUsersMenu(SystemData *sysData)
 {
+
 	StatusInfo status;
 	return status;
 }

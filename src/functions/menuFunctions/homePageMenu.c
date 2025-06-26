@@ -18,7 +18,7 @@ void homePageMenu(SystemData *sysData)
 		int choice;
 		do
 		{
-			displayBanner();
+			displayBanner(sysData);
 			centerStrings("Welcome to UniCambio [Bem vindo ao UniCambio]");
 			printf("\n");
 			centerStrings("HOME PAGE [PÁGINA INICIAL]");

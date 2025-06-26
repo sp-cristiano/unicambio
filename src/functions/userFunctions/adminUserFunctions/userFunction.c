@@ -197,22 +197,27 @@ StatusInfo createUser(SystemData *sysData, char *name, char *username, char *ema
 
 StatusInfo saveUserData(SystemData *sysData)
 {
+	StatusInfo status;
+
 	if (!sysData)
 	{
 		logPrintMessage(LOG_ERROR, "System data is Null. Failed to save user data [ Dados do sistema nulo. Falha ao salvar dados do usuário ]", yes);
-		return failed;
+		status = failed;
+		return status;
 	}
 	FILE *userFile = fopen(USER_DATA_FILE_PATH, "w");
 	if (!userFile)
 	{
 		logPrintMessage(LOG_ERROR, "Failed to open user data file [ Falha ao abrir o arquivo de dados do usuário ]", yes);
-		return failed;
+		status = failed;
+		return status;
 	}
 	if (sysData->userCount == 0)
 	{
 		logPrintMessage(LOG_INFO, "There is no new user to save [ Nao houve nenhum novo usuário para salvar ]", yes);
 		fclose(userFile);
-		return successful;
+		status = successful;
+		return status;
 	}
 
 	for (size_t i = 0; i < sysData->userCount; i++)
@@ -222,10 +227,12 @@ StatusInfo saveUserData(SystemData *sysData)
 	if (fclose(userFile) != 0)
 	{
 		logPrintMessage(LOG_ERROR, "Failed to close user data file [ Falha ao fechar o arquivo de dados do usuário ]", yes);
-		return failed;
+		status = failed;
+		return status;
 	}
+	status = successful;
 	logPrintMessage(LOG_SUCCESS, "User data saved successfully [ Dados do usuário salvos com sucesso ]", yes);
-	return successful;
+	return status;
 }
 
 StatusInfo loadUserData(SystemData *sysData)

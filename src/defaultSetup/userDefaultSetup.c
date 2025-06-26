@@ -16,7 +16,6 @@ StatusInfo createUserDefaultSetup(SystemData *sysData)
 	{
 		logPrintMessage(LOG_WARNING, "User database file not found [ Arquivo de dados do usuário nao encontrado ]", yes);
 		logPrintMessage(LOG_INFO, "Creating user database file [ Criando arquivo de dados do usuário ]", yes);
-		sleep(MID_SLEEP);
 
 		processing();
 
