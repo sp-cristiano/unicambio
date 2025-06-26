@@ -16,5 +16,6 @@ void exitProgram(SystemData *sysData);
 void processing();
 int getUserIndexByID(SystemData *sysData, int userID);
 void logoutUser(SystemData *sysData);
+void clearInputBuffer();
 
 #endif // UTILITIES_H

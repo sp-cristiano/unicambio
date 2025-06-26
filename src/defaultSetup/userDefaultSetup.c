@@ -87,6 +87,7 @@ StatusInfo createUserDefaultSetup(SystemData *sysData)
 		lastLogin[MAX_DATE_LENGTH - 1] = '\0';
 
 		strncpy(dateDeleted, EMPTY_STRING, MAX_DATE_LENGTH - 1);
+		dateDeleted[MAX_DATE_LENGTH - 1] = '\0';
 
 		int roleID = ROLE_ADMIN;
 		int userStatus = active;

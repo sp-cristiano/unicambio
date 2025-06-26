@@ -44,11 +44,11 @@ StatusInfo loadEnvFile(SystemData *sysData, const char *envFilePath)
 		logPrintMessage(LOG_ERROR, "System Data or Application Context is NULL", yes);
 		return failed;
 	}
-	FILE *userFile = fopen(USER_DATA_FILE_PATH, "r");
-	if (!userFile)
-	{
-		logPrintMessage(LOG_ERROR, "Default user file doesn't exist, Loading default admin data to app context.", yes);
-		logPrintMessage(LOG_INFO, "[ Arquivo de dados do usuário padrão nao existe, carregando dados do admin padrão para o contexto da aplicação ]", yes);
+	// FILE *userFile = fopen(USER_DATA_FILE_PATH, "r");
+	// if (!userFile)
+	// {
+	// 	logPrintMessage(LOG_ERROR, "Default user file doesn't exist, Loading default admin data to app context.", yes);
+	// 	logPrintMessage(LOG_INFO, "[ Arquivo de dados do usuário padrão nao existe, carregando dados do admin padrão para o contexto da aplicação ]", yes);
 
 		FILE *envFile = fopen(envFilePath, "r");
 		if (envFile == NULL)
@@ -117,10 +117,10 @@ StatusInfo loadEnvFile(SystemData *sysData, const char *envFilePath)
 		sysData->appContextCapacity++;
 		logPrintMessage(LOG_SUCCESS, "Environment file loaded successfully [ Arquivo de ambiente carregado com sucesso ]", yes);
 		return status;
-	}
-	fclose(userFile);
-	logPrintMessage(LOG_SUCCESS, "Environment file doesn't need to load as user file exists ", yes);
-	logPrintMessage(LOG_INFO, "[ Arquivo de ambiente nao precisa ser carregado pois o arquivo de dados do usuário existe ]", yes);
+	// }
+	// fclose(userFile);
+	// logPrintMessage(LOG_SUCCESS, "Environment file doesn't need to load as user file exists ", yes);
+	// logPrintMessage(LOG_INFO, "[ Arquivo de ambiente nao precisa ser carregado pois o arquivo de dados do usuário existe ]", yes);
 	status = successful;
 	return status;
 }

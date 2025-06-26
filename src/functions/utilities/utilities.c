@@ -19,6 +19,14 @@ void centerStrings(char *string)
 	printf("%s\n", string);
 	return;
 }
+// This function will clear input buffer
+void clearInputBuffer()
+{
+	int c;
+	while ((c = getchar()) != '\n' && c != EOF)
+	{
+	}
+}
 // void alignTextTwentyPercentFromLeft(char *string)
 // {
 // 	int stringLength = strlen(string);
@@ -169,7 +177,7 @@ void logoutUser(SystemData *sysData)
 		sysData->appContext->currentUserID = 0;
 		sysData->appContext->exitFlag = false;
 		sysData->appContext->currentUserName = NULL;
-		
+
 		saveSystemData(sysData);
 
 		loginPageMenu(sysData);
@@ -202,9 +210,10 @@ void exitProgram(SystemData *sysData)
 
 		saveSystemData(sysData);
 
-		freeSystemData(sysData);
+		// freeSystemData(sysData);
 		clearScreen();
 		exit(0);
+		return;
 	}
 	else if (choice == 'n' || choice == 'N')
 	{
