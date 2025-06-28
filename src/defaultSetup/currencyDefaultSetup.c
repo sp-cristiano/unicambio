@@ -2,6 +2,7 @@
 #include "../include/structures.h"
 #include "../include/enum.h"
 #include "../include/currencyDefaultSetup.h"
+#include "../include/currencyFunction.h"
 #include "../include/utilities.h"
 #include "../include/logger.h"
 #include "../include/createDB.h"

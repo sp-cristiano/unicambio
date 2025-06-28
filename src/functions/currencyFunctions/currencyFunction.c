@@ -1,6 +1,10 @@
 #include "../include/currencyFunction.h"
+#include "../include/structures.h"
+#include "../include/enum.h"
+#include "../include/utilities.h"
+#include "../include/logger.h"
 
-StatusInfo creatCurrency(SystemData *sysData, char *name, char *code, char *symbol, char *country, int currencyStatus, double rateToOneKz, char *dateCreated, char *lastUpdated, char *dateDeleted)
+StatusInfo createCurrency(SystemData *sysData, char *name, char *code, char *symbol, char *country, int currencyStatus, double rateToOneKz, char *dateCreated, char *lastUpdated, char *dateDeleted)
 {
 	StatusInfo status;
 	if (!sysData)
@@ -136,8 +140,8 @@ StatusInfo creatCurrency(SystemData *sysData, char *name, char *code, char *symb
 			status = successful;
 			saveCurrencyData(sysData);
 		}
-		return status;
 	}
+	return status;
 }
 StatusInfo freeCurrencyVariable(char *name, char *code, char *symbol, char *country, char *dateCreated, char *lastUpdated, char *dateDeleted)
 {
@@ -189,7 +193,7 @@ StatusInfo saveCurrencyData(SystemData *sysData)
 	}
 	for (size_t i = 0; i < sysData->currencyCount; i++)
 	{
-		fprintf(currencyFile, "%d|%s|%s|%s|%s|%d|%ld|%s|%s|%s\n", sysData->currencies[i].currencyID, sysData->currencies[i].name, sysData->currencies[i].code, sysData->currencies[i].symbol, sysData->currencies[i].country, sysData->currencies[i].currencyStatus, sysData->currencies[i].rate, sysData->currencies[i].dateCreated, sysData->currencies[i].lastUpdated, sysData->currencies[i].dateDeleted);
+		fprintf(currencyFile, "%d|%s|%s|%s|%s|%d|%lf|%s|%s|%s\n", sysData->currencies[i].currencyID, sysData->currencies[i].name, sysData->currencies[i].code, sysData->currencies[i].symbol, sysData->currencies[i].country, sysData->currencies[i].currencyStatus, sysData->currencies[i].rate, sysData->currencies[i].dateCreated, sysData->currencies[i].lastUpdated, sysData->currencies[i].dateDeleted);
 	}
 	if (fclose(currencyFile) != 0)
 	{

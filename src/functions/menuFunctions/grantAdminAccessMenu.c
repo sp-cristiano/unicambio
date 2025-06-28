@@ -189,6 +189,7 @@ StatusInfo createUserMenu(SystemData *sysData)
 				break;
 			default:
 				logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
+				clearInputBuffer();
 				break;
 			}
 		}
@@ -363,13 +364,12 @@ StatusInfo createUserMenu(SystemData *sysData)
 
 StatusInfo updateUserProfileMenu(SystemData *sysData)
 {
-	int currentUserRoleID = sysData->appContext->currentUserRoleID, searchedID;
+	int currentUserRoleID = sysData->appContext->currentUserRoleID;
 	char questionToUpdate;
 	size_t userIndex;
 
 	StatusInfo status, updated = failed;
-	// char *searchCriteria = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
-	int searchCriteria;
+
 	int choice;
 	if (currentUserRoleID == ROLE_ADMIN)
 	{
@@ -388,7 +388,6 @@ StatusInfo updateUserProfileMenu(SystemData *sysData)
 			{
 				printf("%ld     %d        %s\n", (i + 1), sysData->users[i].userID, sysData->users[i].name);
 			}
-			// clearInputBuffer();
 			printf("\n");
 			printf("Enter user ID [Digite ID do usuário]: ");
 			scanf("%d", &choice);
@@ -398,8 +397,9 @@ StatusInfo updateUserProfileMenu(SystemData *sysData)
 				performUserOperationsMenu(sysData);
 			}
 			userIndex = (size_t)getUserIndexByID(sysData, choice); // getUserIndexByID()
+			size_t zerro = 0;
 
-			if (userIndex >= (size_t)0 && userIndex < sysData->userCount)
+			if (userIndex >= zerro && userIndex < sysData->userCount)
 			{
 				do
 				{
@@ -439,15 +439,7 @@ StatusInfo updateUserProfileMenu(SystemData *sysData)
 						switch (choice)
 						{
 						case 0:
-							// free(name);
-							// free(username);
-							// free(email);
-							// free(password);
-							// free(phone);
-							// free(now);
 							status = performUserOperationsMenu(sysData);
-							// free(now);
-
 							updated = failed;
 							break;
 						case 1:
@@ -550,6 +542,7 @@ StatusInfo updateUserProfileMenu(SystemData *sysData)
 						default:
 							logPrintMessage(LOG_WARNING, "Invalid Input [Entrada Invalida]", yes);
 							updated = failed;
+							clearInputBuffer();
 							// free(now);
 							break;
 						}
@@ -562,9 +555,12 @@ StatusInfo updateUserProfileMenu(SystemData *sysData)
 					updated = failed;
 				}
 			}
+			else
+			{
+				updated = failed;
+			}
 
 		} while (updated == failed && sysData->appContext->session == true && sysData->appContext->isAuthenticated == true && sysData->appContext->exitFlag == false);
-	
 	}
 	else
 	{

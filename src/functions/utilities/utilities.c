@@ -80,6 +80,7 @@ void displayBanner(SystemData *sysData)
 	if (sysData->appContext->isAuthenticated == true)
 	{
 		printf("WELCOME %s [BEM VINDO %s]\n", sysData->appContext->currentUserName, sysData->appContext->currentUserName);
+		printf("\n\n");
 	}
 	free(dateTime);
 	return;
@@ -162,12 +163,14 @@ void logoutUser(SystemData *sysData)
 	do
 	{
 		displayBanner(sysData);
+		printf("\n");
 		centerStrings("Are you sure you want to logout(y/n)? [Deseja realmente sair (s/n)?]\n");
 		scanf(" %c", &choice);
 		if (choice != 'y' && choice != 'Y' && choice != 's' && choice != 'S' && choice != 'n' && choice != 'N')
 		{
 			logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
-			sleep(MID_SLEEP);
+			clearInputBuffer();
+			sleep(MIN_SLEEP);
 		}
 	} while (choice != 'y' && choice != 'Y' && choice != 's' && choice != 'S' && choice != 'n' && choice != 'N');
 	if (choice == 'y' || choice == 'Y' || choice == 's' || choice == 'S')
@@ -188,6 +191,9 @@ void logoutUser(SystemData *sysData)
 	}
 	else if (choice == 'n' || choice == 'N')
 	{
+		logPrintMessage(LOG_INFO, "Returning to main menu... [Retornando ao menu principal...]", yes);
+		// processing();
+		sleep(MIN_SLEEP);
 		homePageMenu(sysData);
 	}
 }
@@ -198,19 +204,21 @@ void exitProgram(SystemData *sysData)
 	do
 	{
 		displayBanner(sysData);
+		printf("\n");
 		centerStrings("Are you sure you want to exit this program(y/n)? [Deseja realmente sair deste programa (s/n)?]\n");
 		scanf(" %c", &choice);
 		if (choice != 'y' && choice != 'Y' && choice != 's' && choice != 'S' && choice != 'n' && choice != 'N')
 		{
 			logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
-			sleep(MID_SLEEP);
+			clearInputBuffer();
+			sleep(MIN_SLEEP);
 		}
 	} while (choice != 'y' && choice != 'Y' && choice != 's' && choice != 'S' && choice != 'n' && choice != 'N');
 	if (choice == 'y' || choice == 'Y' || choice == 's' || choice == 'S')
 	{
 		sysData->appContext->exitFlag = true;
 		logPrintMessage(LOG_SUCCESS, "Exiting program... [Saindo do programa...]", yes);
-		sleep(MAX_SLEEP);
+		// sleep(MAX_SLEEP);
 
 		saveSystemData(sysData);
 
@@ -230,147 +238,25 @@ void exitProgram(SystemData *sysData)
 void processing()
 {
 	printf("Processing [Processando]: ");
-	for (int i = 0; i < 90; i++)
+	for (int i = 0; i < 20; i++)
 	{
 		printf("#");
+		// sleep(1);
+		// if (i == 7)
+		// {
+		// 	printf("#");
+		// 	sleep(0.0001);
+		// }
+		// if (i == 30)
+		// {
+		// 	printf("#");
+		// 	sleep(0.0001);
+		// }
 		// sleep(MIN_SLEEP);
 	}
+	printf("  100%% Completed [100%% Concluido]\n");
 	printf("\n");
 }
-
-// size_t getUserIndexByID(SystemData *sysData, int userID)
-// {
-// 	for (size_t i = 0; i < sysData->userCount; i++)
-// 	{
-// 		if (sysData->users[i].userID == userID)
-// 		{
-// 			return i;
-// 		}
-// 	}
-// 	logPrintMessage(LOG_ERROR, "User index not found  [Indice do usuário nao encontrado]", yes);
-// 	return failed;
-// }
-// int getUserIDByMultipleSearch(SystemData *sysData, char *multiSearch)
-// {
-// if (!sysData)
-// {
-// 	logPrintMessage(LOG_ERROR, "System data is Null. Failed to get user ID [ Dados do sistema nulo. Falha ao obter ID do usuário ]", yes);
-// 	return failed;
-// }
-// if (!multiSearch)
-// {
-// 	logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
-// 	return failed;
-// }
-
-// char *tempCharMultipleSearch = malloc(sizeof(char) * MAX_NAME_LENGTH);
-// if (!tempCharMultipleSearch)
-// {
-// 	logPrintMessage(LOG_ERROR, "Failed to allocate memory for temporary string [ Falha ao alocar memória para a string temporária ]", yes);
-// 	return failed;
-// }
-// strncpy(tempCharMultipleSearch, multiSearch, MAX_NAME_LENGTH - 1);
-// tempCharMultipleSearch[MAX_NAME_LENGTH - 1] = '\0';
-
-// if (strlen(tempCharMultipleSearch) == 0)
-// {
-// 	logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
-// 	free(tempCharMultipleSearch);
-// 	return failed;
-// }
-// int userID = failed;
-// int tempIntMultipleSearch = atoi(tempCharMultipleSearch);
-
-// for (size_t i = 0; i < sysData->userCount; i++)
-// {
-// 	if (sysData->users[i].userID == tempIntMultipleSearch || (sysData->users[i].username && strcmp(sysData->users[i].username, tempCharMultipleSearch) == 0) || (sysData->users[i].email && strcmp(sysData->users[i].email, tempCharMultipleSearch) == 0) || (sysData->users[i].phone && strcmp(sysData->users[i].phone, tempCharMultipleSearch) == 0))
-// 	{
-// 		// free(tempCharMultipleSearch);
-// 		userID = sysData->users[i].userID;
-// 		// printf("%d\n", tempIntMultipleSearch);
-// 		return userID;
-// 	}
-// }
-// free(tempCharMultipleSearch);
-// if (userID == failed)
-// {
-// 	logPrintMessage(LOG_ERROR, "User not found while searching [Usuário nao encontrado ao procurar]", yes);
-// }
-// return userID;
-// }
-
-// // Better version
-// int getUserIndexByID(SystemData *sysData, int userID, size_t *outIndex)
-// {
-// 	for (size_t i = 0; i < sysData->userCount; i++)
-// 	{
-// 		if (sysData->users[i].userID == userID)
-// 		{
-// 			if (outIndex)
-// 				*outIndex = i;
-// 			return 0; // success
-// 		}
-// 	}
-// 	return -1; // not found
-// }
-
-// int getUserIDByMultipleSearch(SystemData *sysData, char *multiSearch)
-// {
-// 	if (!sysData || !multiSearch)
-// 	{
-// 		logPrintMessage(LOG_ERROR, "Invalid input: System data or search string is NULL", yes);
-// 		return failed;
-// 	}
-
-// 	char tempCharMultipleSearch[MAX_NAME_LENGTH];
-// 	strncpy(tempCharMultipleSearch, multiSearch, sizeof(tempCharMultipleSearch) - 1);
-// 	tempCharMultipleSearch[sizeof(tempCharMultipleSearch) - 1] = '\0';
-
-// 	if (strlen(tempCharMultipleSearch) == 0)
-// 	{
-// 		logPrintMessage(LOG_ERROR, "Invalid input: Empty search string", yes);
-// 		return failed;
-// 	}
-
-// 	errno = 0;
-// 	char *endptr;
-// 	long tempLong = strtol(tempCharMultipleSearch, &endptr, 10);
-// 	int tempIntMultipleSearch = 0;
-
-// 	if (errno == ERANGE || tempLong > INT_MAX || tempLong < INT_MIN)
-// 	{
-// 		tempIntMultipleSearch = 0; // Out of range
-// 	}
-// 	else if (endptr != tempCharMultipleSearch && *endptr == '\0')
-// 	{
-// 		tempIntMultipleSearch = (int)tempLong;
-// 	}
-// 	else
-// 	{
-// 		tempIntMultipleSearch = 0; // Not a valid integer
-// 	}
-
-// 	int userID = failed;
-
-// 	for (size_t i = 0; i < sysData->userCount; i++)
-// 	{
-// 		if (sysData->users[i].userID == tempIntMultipleSearch ||
-// 				(sysData->users[i].username && strcmp(sysData->users[i].username, tempCharMultipleSearch) == 0) ||
-// 				(sysData->users[i].email && strcmp(sysData->users[i].email, tempCharMultipleSearch) == 0) ||
-// 				(sysData->users[i].phone && strcmp(sysData->users[i].phone, tempCharMultipleSearch) == 0))
-// 		{
-// 			userID = sysData->users[i].userID;
-// 			break;
-// 		}
-// 	}
-
-// 	if (userID == failed)
-// 	{
-// 		logPrintMessage(LOG_ERROR, "User not found while searching [Usuário nao encontrado ao procurar]", yes);
-// 	}
-
-// 	return userID;
-// }
 
 int getUserIndexByID(SystemData *sysData, int userID)
 {
@@ -381,6 +267,7 @@ int getUserIndexByID(SystemData *sysData, int userID)
 			return i;
 		}
 	}
+	logPrintMessage(LOG_ERROR, "User not found [Usuário nao encontrado]", yes);
 	return failed;
 }
 
@@ -393,18 +280,31 @@ StatusInfo viewSingleUser(SystemData *sysData, size_t userIndex)
 	}
 	printf("\n");
 	centerStrings("===== USER DATA [DADOS DO USUARIO] =====\n");
-	printf("User ID [ID do usuário]: %d\n", sysData->users[userIndex].userID);
-	printf("User Name [Nome do usuário]: %s\n", sysData->users[userIndex].name);
-	printf("User Username [Username do usuário]: %s\n", sysData->users[userIndex].username);
-	printf("User Email [Email do usuário]: %s\n", sysData->users[userIndex].email);
+	printSymbols(SCREEN_WIDTH, '-');
+	printf("ID [ID do usuário]:                            %d\n", sysData->users[userIndex].userID);
+	printSymbols(SCREEN_WIDTH, '-');
+	printf("Name [Nome do usuário]:                        %s\n", sysData->users[userIndex].name);
+	printSymbols(SCREEN_WIDTH, '-');
+	printf("Username [Username do usuário]:                %s\n", sysData->users[userIndex].username);
+	printSymbols(SCREEN_WIDTH, '-');
+	printf("Email [Email do usuário]:                      %s\n", sysData->users[userIndex].email);
 	// printf("User Password [Senha do usuário]: %s\n", sysData->users[userIndex].password);
-	printf("User Phone [Telefone do usuário]: %s\n", sysData->users[userIndex].phone);
-	printf("User Role [Papel do usuário]: %d\n", sysData->users[userIndex].roleID);
-	printf("User Status [Status do usuário]: %d\n", sysData->users[userIndex].userStatus);
-	printf("User Date Created [Data de criação do usuário]: %s\n", sysData->users[userIndex].dateCreated);
-	printf("User Last Updated [Data de atualização do usuário]: %s\n", sysData->users[userIndex].lastUpdated);
-	printf("User Last Login [Data de login do usuário]: %s\n", sysData->users[userIndex].lastLogin);
-	printf("User Date Deleted [Data de exclusão do usuário]: %s\n", sysData->users[userIndex].dateDeleted);
+	printSymbols(SCREEN_WIDTH, '-');
+	printf("Phone [Telefone do usuário]:                   %s\n", sysData->users[userIndex].phone);
+	printSymbols(SCREEN_WIDTH, '-');
+	printf("Role [Papel do usuário]:                       %d\n", sysData->users[userIndex].roleID);
+	printSymbols(SCREEN_WIDTH, '-');
+	printf("Status [Status do usuário]:                    %d\n", sysData->users[userIndex].userStatus);
+	printSymbols(SCREEN_WIDTH, '-');
+	printf("Date Created [Data de criação do usuário]:     %s\n", sysData->users[userIndex].dateCreated);
+	printSymbols(SCREEN_WIDTH, '-');
+	printf("Last Updated [Data de atualização do usuário]: %s\n", sysData->users[userIndex].lastUpdated);
+	printSymbols(SCREEN_WIDTH, '-');
+	printf("Last Login [Data de login do usuário]:         %s\n", sysData->users[userIndex].lastLogin);
+	printSymbols(SCREEN_WIDTH, '-');
+	printf("Date Deleted [Data de exclusão do usuário]:    %s\n", sysData->users[userIndex].dateDeleted);
+	printSymbols(SCREEN_WIDTH, '-');
+	return successful;
 }
 void selectOptionToUpdateUserByAdmin(SystemData *sysData, size_t userIndex)
 {

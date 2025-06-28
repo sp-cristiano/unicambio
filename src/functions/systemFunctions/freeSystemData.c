@@ -1,6 +1,7 @@
 #include "../include/freeSystemData.h"
 #include "../include/structures.h"
 #include "../include/userFunction.h"
+#include "../include/currencyFunction.h"
 #include "../include/enum.h"
 #include "../include/utilities.h"
 #include "../include/env.h"

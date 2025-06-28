@@ -37,6 +37,7 @@ StatusInfo initDefaultSetup(SystemData *sysData)
 		logPrintMessage(LOG_ERROR, "Failed to create default currency setup [ Falha ao criar configuração padrão da moeda ]", yes);
 		return status;
 	}
+	processing();
 	status = successful;
 	return status;
 }

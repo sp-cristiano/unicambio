@@ -12,6 +12,7 @@
 
 int main()
 {
+	clearScreen();
 	srand((unsigned int)time(NULL));
 
 	setLocation();

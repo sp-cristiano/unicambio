@@ -64,8 +64,8 @@ StatusInfo loginPageMenu(SystemData *sysData)
 				displayBanner(sysData);
 				if (isAuthenticated == false)
 				{
-					printf("\n\t\t\t\t\t\tMaximum Trials [Máximo de tentativas]: %d\n", MAX_LOGIN_ATTEMPTS);
-					printf("\t\t\t\t\t\tRemaining Trials [Tentativas restantes]: %d\n\n", MAX_LOGIN_ATTEMPTS - loginAttempts);
+					printf("\n\t\t\t\t\t\t\t  Maximum Trials [Máximo de tentativas]: %d\n", MAX_LOGIN_ATTEMPTS);
+					printf("\t\t\t\t\t\t\tRemaining Trials [Tentativas restantes]: %d\n\n", MAX_LOGIN_ATTEMPTS - loginAttempts);
 
 					centerStrings("LOGIN PAGE [PÁGINA DE LOGIN]\n\n");
 					centerStrings("Input 0 to go back to the previous page [Digite 0 para voltar para a página anterior]\n\n");
@@ -93,43 +93,44 @@ StatusInfo loginPageMenu(SystemData *sysData)
 
 					isAuthenticated = authenticateUser(sysData, username, password);
 
-					// if (isAuthenticated == false)
-					// {
-					// if (loginAttempts == MAX_LOGIN_ATTEMPTS)
-					// {
-					// 	logPrintMessage(LOG_ERROR, "Maximum login attempts reached [Limite de tentativas de login alcancado]", yes);
-					// 	logPrintMessage(LOG_ERROR, "[Limite de tentativas de login alcancado]", yes);
-					// 	exitFlag = true;
-					// 	loginAttempts = 0;
-					// 	session = false;
-					// 	goBack = true;
-					// 	homePageMenu(sysData);
-					// 	return isAuthenticated;
-					// }
-					// }
+					if (isAuthenticated == false)
+					{
+						if (loginAttempts == MAX_LOGIN_ATTEMPTS - 1)
+						{
+							logPrintMessage(LOG_ERROR, "Maximum login attempts reached [Limite de tentativas de login alcancado]", yes);
+							logPrintMessage(LOG_ERROR, "[Limite de tentativas de login alcancado]", yes);
+							exitFlag = true;
+							loginAttempts = 0;
+							session = false;
+							goBack = true;
+							homePageMenu(sysData);
+							return isAuthenticated;
+						}
+					}
 					loginAttempts++;
 				}
 			}
-			if (isAuthenticated == false)
-			{
-				if (loginAttempts >= MAX_LOGIN_ATTEMPTS)
-				{
-					displayBanner(sysData);
-					logPrintMessage(LOG_ERROR, "Maximum login attempts reached [Limite de tentativas de login alcancado]", yes);
-					logPrintMessage(LOG_ERROR, "[Limite de tentativas de login alcancado]", yes);
-					exitFlag = true;
-					loginAttempts = 0;
-					session = false;
-					goBack = true;
-					homePageMenu(sysData);
-					return isAuthenticated;
-				}
-			}
+			// if (isAuthenticated == false)
+			// {
+			// 	if (loginAttempts >= MAX_LOGIN_ATTEMPTS)
+			// 	{
+			// 		displayBanner(sysData);
+			// 		logPrintMessage(LOG_ERROR, "Maximum login attempts reached [Limite de tentativas de login alcancado]", yes);
+			// 		logPrintMessage(LOG_ERROR, "[Limite de tentativas de login alcancado]", yes);
+			// 		exitFlag = true;
+			// 		loginAttempts = 0;
+			// 		session = false;
+			// 		goBack = true;
+			// 		homePageMenu(sysData);
+			// 		return isAuthenticated;
+			// 	}
+			// }
 
 		} while (exitFlag == false && isAuthenticated == false);
 	}
 	if (isAuthenticated == true)
 	{
+		goBack = false;
 		grantLoginAccess(sysData, sysData->appContext->currentUserID);
 	}
 }
@@ -210,7 +211,7 @@ StatusInfo grantLoginAccess(SystemData *sysData, int userID)
 	int userRole = sysData->appContext->currentUserRoleID;
 
 	size_t userIndex = getUserIndexByID(sysData, userID);
-	if (userIndex < (size_t) 0)
+	if (userIndex < (size_t)0)
 	{
 		logPrintMessage(LOG_ERROR, "Invalid user ID [ID de usuário inválido]", yes);
 		return failed;

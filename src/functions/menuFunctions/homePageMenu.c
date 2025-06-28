@@ -9,12 +9,32 @@
 #include "../include/grantLimitedAccessMenu.h"
 #include "../include/grantUserAccessMenu.h"
 
+
 void homePageMenu(SystemData *sysData)
 {
-	if (sysData->appContext->isAuthenticated == false)
+	if (!sysData)
+	{
+		logPrintMessage(LOG_ERROR, "Failed to access system data [ Falha ao acessar os dados do sistema ]", yes);
+		return;
+	}
+	if (!sysData->appContext)
+	{
+		logPrintMessage(LOG_ERROR, "Failed to access app context [ Falha ao acessar o contexto da aplicação ]", yes);
+		return;
+	}
+
+	int exitFlag = sysData->appContext->exitFlag, isAuthenticated = sysData->appContext->isAuthenticated, session = sysData->appContext->session;
+
+	if (sysData->userCount == 0)
+	{
+		logPrintMessage(LOG_ERROR, "No user in the system. Please create a default admin user by filling the .env file", yes);
+		logPrintMessage(LOG_ERROR, "[ Nenhuma pessoa cadastrada no sistema. Por favor, crie um usuário admin padrão preenchendo o arquivo .env ]", yes);
+		return;
+	}
+	if (isAuthenticated == false && session == false && exitFlag == false)
 	{
 
-		sysData->appContext->exitFlag = false;
+		// sysData->appContext->exitFlag = false;
 		int choice;
 		do
 		{
@@ -42,6 +62,7 @@ void homePageMenu(SystemData *sysData)
 
 			default:
 				logPrintMessage(LOG_ERROR, "Invalid choice [Opção inválida]", yes);
+				clearInputBuffer();
 				break;
 			}
 

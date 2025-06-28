@@ -4,7 +4,7 @@
 #include "../include/structures.h"
 #include "../include/enum.h"
 
-StatusInfo creatCurrency(SystemData *sysData, char *name, char *code, char *symbol, char *country, int currencyStatus, double rateToOneKz, char *dateCreated, char *lastUpdated, char *dateDeleted);
+StatusInfo createCurrency(SystemData *sysData, char *name, char *code, char *symbol, char *country, int currencyStatus, double rateToOneKz, char *dateCreated, char *lastUpdated, char *dateDeleted);
 
 StatusInfo saveCurrencyData(SystemData *sysData);
 StatusInfo loadCurrencyData(SystemData *sysData);
