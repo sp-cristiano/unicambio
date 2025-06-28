@@ -19,7 +19,7 @@ void logoutUser(SystemData *sysData);
 void clearInputBuffer();
 int getUserIDByMultipleSearch(SystemData *sysData, char *multiSearch);
 StatusInfo viewSingleUser(SystemData *sysData, size_t userIndex);
-void selectOptionToUpdateUserByAdmin(SystemData *sysData, size_t userIndex);
+void selectOptionToUpdateUserByAdmin();
 double convertRateToOneKz(double rate);
 double convertRateFromOneKz(double rateToOneKz);
 double getCurrencyRateToOneKz(SystemData *sysData, int currencyID);

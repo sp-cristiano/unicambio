@@ -306,12 +306,12 @@ StatusInfo viewSingleUser(SystemData *sysData, size_t userIndex)
 	printSymbols(SCREEN_WIDTH, '-');
 	return successful;
 }
-void selectOptionToUpdateUserByAdmin(SystemData *sysData, size_t userIndex)
+void selectOptionToUpdateUserByAdmin()
 {
 	centerStrings("UPDATE USER PROFILE ");
-	printf("FOR %s\n ", sysData->users[userIndex].name);
+	// printf("FOR %s\n ", sysData->users[userIndex].name);
 	centerStrings(" [ATUALIZAR PERFIL DE USUARIO ");
-	printf("PARA %s\n", sysData->users[userIndex].name);
+	// printf("PARA %s\n", sysData->users[userIndex].name);
 	printf("\n");
 	centerStrings("Select option from  1 to 7 to navigate this menu. Select 0 to Logout.\n");
 	centerStrings("Selecione a opção de 1 a 7 para navegar nesta menu. Selecione 0 para sair.\n");

@@ -11,6 +11,7 @@ StatusInfo saveUserData(SystemData *sysData);
 StatusInfo loadUserData(SystemData *sysData);
 StatusInfo freeUserData(SystemData *sysData);
 StatusInfo freeUserDataVariable(char *name, char *username, char *email, char *password, char *phone, char *dateCreated, char *lastUpdated, char *lastLogin, char *dateDeleted);
+StatusInfo updateUser(SystemData *sysData, size_t userIndex, int choice, char *now, StatusInfo updated, StatusInfo status);
 
 StatusInfo freeMemoryAllocatedToUserStructure(SystemData *sysData);
 
