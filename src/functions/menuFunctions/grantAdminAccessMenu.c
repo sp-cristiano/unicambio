@@ -52,6 +52,7 @@ StatusInfo grantAdminAccessMenu(SystemData *sysData)
 				break;
 			default:
 				logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
+				clearInputBuffer();
 				break;
 			}
 		} while ((choice < 0 || choice > 4) && sysData->appContext->session == true && sysData->appContext->isAuthenticated == true && sysData->appContext->exitFlag == false);
@@ -104,6 +105,7 @@ StatusInfo performUserOperationsMenu(SystemData *sysData)
 			break;
 		default:
 			logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
+			clearInputBuffer();
 			break;
 		}
 
@@ -546,7 +548,7 @@ StatusInfo updateUserProfileMenu(SystemData *sysData)
 							// free(now);
 							break;
 						}
-						free(now);
+						// free(now);
 					} while ((choice < 0 || choice > 7));
 				}
 				else if (questionToUpdate == 'n' || questionToUpdate == 'N')
