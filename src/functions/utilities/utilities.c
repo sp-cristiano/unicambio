@@ -166,11 +166,12 @@ void logoutUser(SystemData *sysData)
 		printf("\n");
 		centerStrings("Are you sure you want to logout(y/n)? [Deseja realmente sair (s/n)?]\n");
 		scanf(" %c", &choice);
+		clearInputBuffer();
 		if (choice != 'y' && choice != 'Y' && choice != 's' && choice != 'S' && choice != 'n' && choice != 'N')
 		{
 			logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
-			clearInputBuffer();
-			sleep(MIN_SLEEP);
+			// clearInputBuffer();
+			// sleep(MIN_SLEEP);
 		}
 	} while (choice != 'y' && choice != 'Y' && choice != 's' && choice != 'S' && choice != 'n' && choice != 'N');
 	if (choice == 'y' || choice == 'Y' || choice == 's' || choice == 'S')
@@ -186,17 +187,19 @@ void logoutUser(SystemData *sysData)
 		sysData->appContext->currentUserRoleID = 0;
 		sysData->appContext->currentUserID = 0;
 		sysData->appContext->exitFlag = false;
+		sysData->appContext->loginAttempts = 0;
 		sysData->appContext->currentUserName = NULL;
 
 		saveSystemData(sysData);
 
 		loginPageMenu(sysData);
+		return;
 	}
 	else if (choice == 'n' || choice == 'N')
 	{
 		logPrintMessage(LOG_INFO, "Returning to main menu... [Retornando ao menu principal...]", yes);
 		// processing();
-		sleep(MIN_SLEEP);
+		// sleep(MIN_SLEEP);
 		homePageMenu(sysData);
 	}
 }

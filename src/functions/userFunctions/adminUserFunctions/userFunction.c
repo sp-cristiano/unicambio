@@ -416,24 +416,6 @@ StatusInfo updateUser(SystemData *sysData, size_t userIndex, int choice, char *n
 		strcpy(sysData->users[userIndex].lastUpdated, now);
 		updated = saveSystemData(sysData);
 		status = successful;
-		// free(name);
-		// free(now);
-		// do{
-		// 	displayBanner(sysData);
-		// 	centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]\n");
-		// 	centerStrings("UPDATE USER PROFILE [ATUALIZAR PERFIL DE USUARIO]");
-		// 	printf("\n");
-		// 	viewSingleUser(sysData, userIndex);
-		// 	printf("Press 0 to go back to user menu [Pressione 0 para voltar ao menu de usuário]: ");
-		// 	scanf("%d", &goBack);
-		// 	clearInputBuffer();
-		// }while(goBack != 0);
-		// if (goBack == 0)
-		// {
-		// 	status = performUserOperationsMenu(sysData);
-		// 	updated = failed;
-		// }
-
 		break;
 	case 2:
 		char *username = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));

@@ -14,6 +14,7 @@ StatusInfo createUserDefaultSetup(SystemData *sysData)
 	FILE *checkUserFile = fopen(USER_DATA_FILE_PATH, "r");
 	if (!checkUserFile)
 	{
+		printf("\n\n");
 		logPrintMessage(LOG_WARNING, "User database file not found [ Arquivo de dados do usuário nao encontrado ]", yes);
 		logPrintMessage(LOG_INFO, "Creating user database file [ Criando arquivo de dados do usuário ]", yes);
 
@@ -22,12 +23,14 @@ StatusInfo createUserDefaultSetup(SystemData *sysData)
 		status = createUserDBFile();
 		if (status == failed)
 		{
+			printf("\n\n");
 			logPrintMessage(LOG_ERROR, "Failed to create user database file [ Falha ao criar o arquivo de dados do usuário ]", yes);
-			return failed;
+			return status;
 		}
 
 		if (!sysData->appContext->adminUserEmail || !sysData->appContext->adminUserPassword || !sysData->appContext->adminUserPhone)
 		{
+			printf("\n\n");
 			logPrintMessage(LOG_ERROR, "Admin default user data in app context is empty [ Dados padrão do usuário admin no contexto da aplicação estao vazios ]", yes);
 			status = failed;
 			return status;
@@ -45,6 +48,7 @@ StatusInfo createUserDefaultSetup(SystemData *sysData)
 
 		if (name == NULL || username == NULL || email == NULL || password == NULL || phone == NULL || dateCreated == NULL || lastUpdated == NULL || lastLogin == NULL || dateDeleted == NULL)
 		{
+			printf("\n\n");
 			logPrintMessage(LOG_ERROR, "Memory allocation for user default data failed [ Alocacao de memoria falhou para os dados padrão do usuário ]", yes);
 			freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
 			status = failed;
@@ -55,12 +59,14 @@ StatusInfo createUserDefaultSetup(SystemData *sysData)
 
 		if (!now)
 		{
+			printf("\n\n");
 			logPrintMessage(LOG_ERROR, "Failed to get current date and time [ Falha ao obter a data e hora atual ]", yes);
 			freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
 			free(now);
 			status = failed;
 			return status;
 		}
+
 		strncpy(name, DEFAULT_ADMIN_NAME, MAX_NAME_LENGTH - 1);
 		name[MAX_NAME_LENGTH - 1] = '\0';
 
@@ -98,16 +104,19 @@ StatusInfo createUserDefaultSetup(SystemData *sysData)
 
 		if (status != successful)
 		{
+			printf("\n\n");
 			logPrintMessage(LOG_ERROR, "Failed to create user [ Falha ao criar o usuário ]", yes);
 			status = failed;
 			return status;
 		}
+		printf("\n\n");
 		logPrintMessage(LOG_SUCCESS, "Default User created successfully [ Usuário criado com sucesso ]", yes);
 		status = successful;
 		return status;
 	}
 	else
 	{
+		printf("\n\n");
 		logPrintMessage(LOG_INFO, "User database file found [ Arquivo de dados do usuário encontrado ]", yes);
 		status = successful;
 		fclose(checkUserFile);

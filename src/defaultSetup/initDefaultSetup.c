@@ -11,14 +11,16 @@
 StatusInfo initDefaultSetup(SystemData *sysData)
 {
 	StatusInfo status;
-	logPrintMessage(LOG_INFO, "Initializing default system setup [ Iniciando configuração padrão do sistema ]", yes);
 
+	printf("\n\n");
+	logPrintMessage(LOG_INFO, "Initializing default system setup [ Iniciando configuração padrão do sistema ]", yes);
 
 	processing();
 
 	if (loadEnvFile(sysData, ENV_FILE_PATH) != successful)
 	{
 		status = failed;
+		printf("\n\n");
 		logPrintMessage(LOG_ERROR, "Failed to load environment file [ Falha ao carregar o arquivo de ambiente ]", yes);
 		return status;
 	}
@@ -28,16 +30,20 @@ StatusInfo initDefaultSetup(SystemData *sysData)
 	if (createUserDefaultSetup(sysData) != successful)
 	{
 		status = failed;
+		printf("\n\n");
 		logPrintMessage(LOG_ERROR, "Failed to create default user setup [ Falha ao criar configuração padrão do usuário ]", yes);
 		return status;
 	}
 	processing();
-	if(createCurrencyDefaultSetup(sysData) != successful){
+	if (createCurrencyDefaultSetup(sysData) != successful)
+	{
 		status = failed;
+		printf("\n\n");
 		logPrintMessage(LOG_ERROR, "Failed to create default currency setup [ Falha ao criar configuração padrão da moeda ]", yes);
 		return status;
 	}
 	processing();
 	status = successful;
+
 	return status;
 }

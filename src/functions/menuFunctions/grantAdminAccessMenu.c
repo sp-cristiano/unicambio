@@ -11,61 +11,65 @@
 
 StatusInfo grantAdminAccessMenu(SystemData *sysData)
 {
-	int choice;
+	int choice, result;
 	StatusInfo status;
-	if (sysData->appContext->session == true && sysData->appContext->isAuthenticated == true && sysData->appContext->currentUserRoleID == ROLE_ADMIN)
+	while (sysData->appContext->session == true && sysData->appContext->isAuthenticated == true && sysData->appContext->exitFlag == false)
 	{
-		do
-		{
-			displayBanner(sysData);
-			centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]");
-			printf("\n");
-			centerStrings("Select option from  1 to 4 to navigate this menu. Select 0 to Logout.\n");
-			centerStrings("Selecione a opção de 1 a 4 para navegar nesta menu. Selecione 0 para sair.\n");
-			printf("\n");
-			printf("\n\t\t1. - Perforn User Operations [Realizar operações de usuário]\n\n");
-			printf("\t\t2. - Perform Currency Operations [Realizar operações de moeda]\n\n");
-			printf("\t\t3. - Perform Exchange Rate Operations [Realizar operações de taxa de caâmbio]\n\n");
-			printf("\t\t4. - Perform Transaction Operations [Realizar operações de transação]\n\n");
-			printf("\t\t0. - Logout [Sair]\n\n");
-			printf("\n");
-			printf("Enter your choice [Digite sua opção]: ");
-			scanf("%d", &choice);
-			
-			// printf("\n");
+		displayBanner(sysData);
+		centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]");
+		printf("\n");
+		centerStrings("Select option from  1 to 4 to navigate this menu. Select 0 to Logout.\n");
+		centerStrings("Selecione a opção de 1 a 4 para navegar nesta menu. Selecione 0 para sair.\n");
+		printf("\n");
+		printf("\n\t\t1. - Perforn User Operations [Realizar operações de usuário]\n\n");
+		printf("\t\t2. - Perform Currency Operations [Realizar operações de moeda]\n\n");
+		printf("\t\t3. - Perform Exchange Rate Operations [Realizar operações de taxa de caâmbio]\n\n");
+		printf("\t\t4. - Perform Transaction Operations [Realizar operações de transação]\n\n");
+		printf("\t\t0. - Logout [Sair]\n\n");
+		printf("\n");
+		printf("Enter your choice [Digite sua opção]: ");
+		result = scanf("%d", &choice);
+		clearInputBuffer();
 
-			switch (choice)
-			{
-			case 0:
-				logoutUser(sysData);
-				break;
-			case 1:
-				status = performUserOperationsMenu(sysData);
-				break;
-			case 2:
-				status = performCurrencyOperationsMenu(sysData);
-				break;
-			case 3:
-				status = performExchangeRateOperationsMenu(sysData);
-				break;
-			case 4:
-				status = performTransactionOperationsMenu(sysData);
-				break;
-			default:
-				logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
-				clearInputBuffer();
-				break;
-			}
-		} while ((choice < 0 || choice > 4) && sysData->appContext->session == true && sysData->appContext->isAuthenticated == true && sysData->appContext->exitFlag == false);
+		if (result != 1 || choice < 0 || choice > 4)
+		{
+			printf("\n\n");
+			logPrintMessage(LOG_ERROR, "Invalid input. Please try again. [Entrada inválida. Por favor, tente novamente.]", yes);
+			status = failed;
+			continue;
+		}
+		switch (choice)
+		{
+		case 0:
+			logoutUser(sysData);
+			break;
+		case 1:
+			status = performUserOperationsMenu(sysData);
+			break;
+		case 2:
+			status = performCurrencyOperationsMenu(sysData);
+			break;
+		case 3:
+			status = performExchangeRateOperationsMenu(sysData);
+			break;
+		case 4:
+			status = performTransactionOperationsMenu(sysData);
+			break;
+		default:
+			printf("\n\n");
+			logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
+			break;
+		}
 	}
 	return status;
 }
 
 StatusInfo performUserOperationsMenu(SystemData *sysData)
 {
-	int choice;
+	int choice, result;
 	StatusInfo status;
-	do
+
+	while (sysData->appContext->session == true && sysData->appContext->isAuthenticated == true && sysData->appContext->exitFlag == false)
 	{
 		displayBanner(sysData);
 		centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]\n");
@@ -82,8 +86,18 @@ StatusInfo performUserOperationsMenu(SystemData *sysData)
 		printf("\t\t0. - Go Back [Voltar]\n\n");
 		printf("\n");
 		printf("Enter your choice [Digite sua opção]: ");
-		scanf("%d", &choice);
-		printf("\n");
+		result = scanf("%d", &choice);
+
+		clearInputBuffer();
+
+		if (result != 1 || (choice < 0 || choice > 5))
+		{
+			printf("\n\n");
+			logPrintMessage(LOG_ERROR, "Invalid input. Please try again. [Entrada inválida. Por favor, tente novamente.]", yes);
+			status = failed;
+			continue;
+		}
+
 		switch (choice)
 		{
 		case 0:
@@ -105,20 +119,20 @@ StatusInfo performUserOperationsMenu(SystemData *sysData)
 			status = deleteUserProfileMenu(sysData);
 			break;
 		default:
+			printf("\n\n");
 			logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
-			clearInputBuffer();
 			break;
 		}
-
-	} while ((choice < 0 || choice > 5) && sysData->appContext->session == true && sysData->appContext->isAuthenticated == true && sysData->appContext->exitFlag == false);
+	}
 	return status;
 }
 
 StatusInfo createUserMenu(SystemData *sysData)
 {
-	StatusInfo status;
-	StatusInfo created = failed;
-	do
+	StatusInfo status, created = failed;
+	int result, roleID, userStatus = active;
+
+	while (created == failed && sysData->appContext->session == true && sysData->appContext->isAuthenticated == true && sysData->appContext->exitFlag == false)
 	{
 		displayBanner(sysData);
 		centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]\n");
@@ -143,7 +157,7 @@ StatusInfo createUserMenu(SystemData *sysData)
 
 		if (name == NULL || username == NULL || email == NULL || password == NULL || phone == NULL || dateCreated == NULL || lastUpdated == NULL || lastLogin == NULL || dateDeleted == NULL)
 		{
-			logPrintMessage(LOG_ERROR, "Memory allocation for user default data failed [ Alocacao de memoria falhou para os dados padrão do usuário ]", yes);
+			logPrintMessage(LOG_ERROR, "Memory allocation for user data failed [ Alocacao de memoria falhou para os dados do usuário ]", yes);
 			freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
 			status = failed;
 			return status;
@@ -160,181 +174,6 @@ StatusInfo createUserMenu(SystemData *sysData)
 			return status;
 		}
 
-		int roleID, userStatus = active, choice = -1;
-
-		while (choice < 0 || choice > 2)
-		{
-			clearInputBuffer();
-			displayBanner(sysData);
-			centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]\n");
-			centerStrings("CREATE USER MENU [MENU DE CRIAR USUARIO]");
-			printf("\n");
-			centerStrings("Select option from  1 to 2 to navigate this menu. Select 0 to go back.\n");
-			centerStrings("Selecione a opção de 1 a 2 para navegar nesta menu. Selecione 0 para voltar.\n");
-			printf("\n");
-			printf("\n\t\t1. - Create Admin [Criar admin]\n\n");
-			printf("\t\t2. - Create User [Criar usuário] \n\n");
-			printf("\t\t0. - Go Back [Voltar]\n\n");
-			printf("Enter your choice [Digite sua opção]: ");
-			scanf("%d", &choice);
-			switch (choice)
-			{
-			case 0:
-				freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
-				free(now);
-				status = performUserOperationsMenu(sysData);
-				return status;
-			case 1:
-				roleID = ROLE_ADMIN;
-				break;
-			case 2:
-				roleID = ROLE_USER;
-				break;
-			default:
-				logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
-				clearInputBuffer();
-				break;
-			}
-		}
-		clearInputBuffer();
-		displayBanner(sysData);
-		printf("Enter user name [Digite o nome do usuário]: ");
-		scanf("%149[^\n]", name);
-		while (strlen(name) <= 0 || (name[0] == '0' && strlen(name) == 1))
-		{
-			if (name[0] == '0' && strlen(name) == 1)
-			{
-				freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
-				free(now);
-				status = performUserOperationsMenu(sysData);
-				return status;
-			}
-			else
-			{
-				if (strlen(name) <= 0)
-				{
-					logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
-				}
-				free(name);
-				clearInputBuffer();
-				displayBanner(sysData);
-				name = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
-				printf("Enter user name [Digite o nome do usuário]: ");
-				scanf("%149[^\n]", name);
-			}
-		}
-
-		clearInputBuffer();
-		displayBanner(sysData);
-		printf("Enter user username [Digite o username do usuário]: ");
-		scanf("%s", username);
-		while (strlen(username) <= 0 || (username[0] == '0' && strlen(username) == 1))
-		{
-			if (username[0] == '0' && strlen(username) == 1)
-			{
-				freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
-				free(now);
-				status = performUserOperationsMenu(sysData);
-				return status;
-			}
-			else
-			{
-				if (strlen(username) <= 0)
-				{
-					logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
-				}
-				free(username);
-				clearInputBuffer();
-				displayBanner(sysData);
-				username = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
-				printf("Enter user username [Digite o username do usuário]: ");
-				scanf("%s", username);
-			}
-		}
-
-		clearInputBuffer();
-		displayBanner(sysData);
-		printf("Enter user email [Digite o email do usuário]: ");
-		scanf("%s", email);
-		while (strlen(email) <= 0 || (email[0] == '0' && strlen(email) == 1))
-		{
-			if (email[0] == '0' && strlen(email) == 1)
-			{
-				freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
-				free(now);
-				status = performUserOperationsMenu(sysData);
-				return status;
-			}
-			else
-			{
-				if (strlen(email) <= 0)
-				{
-					logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
-				}
-				free(email);
-				clearInputBuffer();
-				displayBanner(sysData);
-				email = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
-				printf("Enter user email [Digite o email do usuário]: ");
-				scanf("%s", email);
-			}
-		}
-
-		clearInputBuffer();
-		displayBanner(sysData);
-		printf("Enter user password [Digite a senha do usuário]: ");
-		scanf("%s", password);
-		while (strlen(password) <= 0 || (password[0] == '0' && strlen(password) == 1))
-		{
-			if (password[0] == '0' && strlen(password) == 1)
-			{
-				freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
-				free(now);
-				status = performUserOperationsMenu(sysData);
-				return status;
-			}
-			else
-			{
-				if (strlen(password) <= 0)
-				{
-					logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
-				}
-				free(password);
-				clearInputBuffer();
-				displayBanner(sysData);
-				password = (char *)malloc(MAX_PASSWORD_LENGTH * sizeof(char));
-				printf("Enter user password [Digite a senha do usuário]: ");
-				scanf("%s", password);
-			}
-		}
-
-		clearInputBuffer();
-		displayBanner(sysData);
-		printf("Enter user phone [Digite o telefone do usuário]: ");
-		scanf("%s", phone);
-		while (strlen(phone) <= 0 || (phone[0] == '0' && strlen(phone) == 1))
-		{
-			if (phone[0] == '0' && strlen(phone) == 1)
-			{
-				freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
-				free(now);
-				status = performUserOperationsMenu(sysData);
-				return status;
-			}
-			else
-			{
-				if (strlen(phone) <= 0)
-				{
-					logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
-				}
-				free(phone);
-				clearInputBuffer();
-				displayBanner(sysData);
-				phone = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
-				printf("Enter user phone [Digite o telefone do usuário]: ");
-				scanf("%s", phone);
-			}
-		}
 		strncpy(dateCreated, now, MAX_DATE_LENGTH - 1);
 		dateCreated[MAX_DATE_LENGTH - 1] = '\0';
 
@@ -347,24 +186,238 @@ StatusInfo createUserMenu(SystemData *sysData)
 		strncpy(dateDeleted, EMPTY_STRING, MAX_DATE_LENGTH - 1);
 		dateDeleted[MAX_DATE_LENGTH - 1] = '\0';
 
-		created = createUser(sysData, name, username, email, password, phone, roleID, userStatus, dateCreated, lastUpdated, lastLogin, dateDeleted);
-		freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
-		free(now);
-		if (created == failed)
+		printf("Choose a user role [Escolha um papel de usuário]: ");
+		result = scanf("%d", &roleID);
+
+		clearInputBuffer();
+
+		if (result != 1 || (roleID < 0 || roleID > 2))
 		{
+			printf("\n\n");
+			logPrintMessage(LOG_ERROR, "Invalid input. Please try again. [Entrada inválida. Por favor, tente novamente.]", yes);
+			freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
+			free(now);
 			status = failed;
-			return status;
-		}
-		else
-		{
-			status = successful;
-			performUserOperationsMenu(sysData);
-			return status;
+			continue;
 		}
 
-	} while (sysData->appContext->exitFlag == false && created == failed && sysData->appContext->session == true && sysData->appContext->isAuthenticated == true);
+		switch (roleID)
+		{
+		case 0:
+			freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
+			free(now);
+			status = performUserOperationsMenu(sysData);
+			break;
+		case 1:
+			roleID = ROLE_ADMIN;
+			break;
+		case 2:
+			roleID = ROLE_USER;
+			// status = createUser(sysData, name, username, email, password, phone, roleID, userStatus, dateCreated, lastUpdated, lastLogin, dateDeleted);
+			// freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
+			// free(now);
+			// created = successful;
+			break;
+		default:
+			printf("\n\n");
+			freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
+			free(now);
+			logPrintMessage(LOG_ERROR, "Invalid input [Entrada inválida]", yes);
+			created = failed;
+			break;
+		}
+
+		// for name starts here
+		displayBanner(sysData);
+		printf("\n\nEnter user name [Digite o nome do usuário]: ");
+		result = scanf("%149[^\n]", name);
+		clearInputBuffer();
+		while (result != 1 || strlen(name) == 0)
+		{
+			printf("\n\n");
+			logPrintMessage(LOG_ERROR, "Name can not be empty. Please try again. [O nome nao pode estar vazio. Por favor, tente novamente.]", yes);
+			free(name);
+
+			displayBanner(sysData);
+
+			name = malloc(MAX_NAME_LENGTH * sizeof(char));
+			if (name == NULL)
+			{
+				logPrintMessage(LOG_ERROR, "Memory allocation for user name failed [ Alocacao de memoria falhou para o nome do usuário ]", yes);
+				freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
+				free(now);
+				status = failed;
+				return status;
+			}
+			printf("\n\nEnter user name [Digite o nome do usuário]: ");
+			result = scanf("%149[^\n]", name);
+			clearInputBuffer();
+		}
+		if (strcmp(name, "0") == 0)
+		{
+			sysData->appContext->goBack = true;
+			freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
+			free(now);
+			status = createUserMenu(sysData);
+			return status;
+		}
+		// for name ends here
+
+		// for username starts here
+		displayBanner(sysData);
+		printf("\n\nEnter user username [Digite o nome de usuário]: ");
+		result = scanf("%s", username);
+		clearInputBuffer();
+		while (result != 1 || strlen(username) == 0)
+		{
+			printf("\n\n");
+			logPrintMessage(LOG_ERROR, "Username can not be empty. Please try again. [O nome de usuário nao pode estar vazio. Por favor, tente novamente.]", yes);
+			free(username);
+
+			displayBanner(sysData);
+
+			username = malloc(MAX_NAME_LENGTH * sizeof(char));
+			if (username == NULL)
+			{
+				logPrintMessage(LOG_ERROR, "Memory allocation for user username failed [ Alocacao de memoria falhou para o nome de usuário ]", yes);
+				freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
+				free(now);
+				status = failed;
+				return status;
+			}
+			printf("\n\nEnter user username [Digite o nome de usuário]: ");
+			result = scanf("%s", username);
+			clearInputBuffer();
+		}
+		if (strcmp(username, "0") == 0)
+		{
+			sysData->appContext->goBack = true;
+			freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
+			free(now);
+			status = createUserMenu(sysData);
+			return status;
+		}
+		// for username ends here
+
+		// for email starts here
+		displayBanner(sysData);
+		printf("\n\nEnter user email [Digite o email do usuário]: ");
+		result = scanf("%s", email);
+		clearInputBuffer();
+		while (result != 1 || strlen(email) == 0)
+		{
+			printf("\n\n");
+			logPrintMessage(LOG_ERROR, "Email can not be empty. Please try again. [O email nao pode estar vazio. Por favor, tente novamente.]", yes);
+			free(email);
+
+			displayBanner(sysData);
+
+			email = malloc(MAX_NAME_LENGTH * sizeof(char));
+			if (email == NULL)
+			{
+				logPrintMessage(LOG_ERROR, "Memory allocation for user email failed [ Alocacao de memoria falhou para o email do usuário ]", yes);
+				freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
+				free(now);
+				status = failed;
+				return status;
+			}
+			printf("\n\nEnter user email [Digite o email do usuário]: ");
+			result = scanf("%s", email);
+			clearInputBuffer();
+		}
+		if (strcmp(email, "0") == 0)
+		{
+			sysData->appContext->goBack = true;
+			freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
+			free(now);
+			status = createUserMenu(sysData);
+			return status;
+		}
+		// for email ends here
+
+		// for password starts here
+		displayBanner(sysData);
+		printf("\n\nEnter user password [Digite a senha do usuário]: ");
+		result = scanf("%s", password);
+		clearInputBuffer();
+		while (result != 1 || strlen(password) == 0)
+		{
+			printf("\n\n");
+			logPrintMessage(LOG_ERROR, "Password can not be empty. Please try again. [A senha nao pode estar vazia. Por favor, tente novamente.]", yes);
+			free(password);
+
+			displayBanner(sysData);
+
+			password = malloc(MAX_PASSWORD_LENGTH * sizeof(char));
+			if (password == NULL)
+			{
+				logPrintMessage(LOG_ERROR, "Memory allocation for user password failed [ Alocacao de memoria falhou para a senha do usuário ]", yes);
+				freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
+				free(now);
+				status = failed;
+				return status;
+			}
+			printf("\n\nEnter user password [Digite a senha do usuário]: ");
+			result = scanf("%s", password);
+			clearInputBuffer();
+		}
+		if (strcmp(password, "0") == 0)
+		{
+			sysData->appContext->goBack = true;
+			freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
+			free(now);
+			status = createUserMenu(sysData);
+			return status;
+		}
+		// for password ends here
+
+		// for phone starts here
+		displayBanner(sysData);
+		printf("\n\nEnter user phone [Digite o telefone do usuário]: ");
+		result = scanf("%s", phone);
+		clearInputBuffer();
+		while (result != 1 || strlen(phone) == 0)
+		{
+			printf("\n\n");
+			logPrintMessage(LOG_ERROR, "Phone can not be empty. Please try again. [O telefone nao pode estar vazio. Por favor, tente novamente.]", yes);
+			free(phone);
+
+			displayBanner(sysData);
+
+			phone = malloc(MAX_NAME_LENGTH * sizeof(char));
+			if (phone == NULL)
+			{
+				logPrintMessage(LOG_ERROR, "Memory allocation for user phone failed [ Alocacao de memoria falhou para o telefone do usuário ]", yes);
+				freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
+				free(now);
+				status = failed;
+				return status;
+			}
+			printf("\n\nEnter user phone [Digite o telefone do usuário]: ");
+			result = scanf("%s", phone);
+			clearInputBuffer();
+		}
+		if (strcmp(phone, "0") == 0)
+		{
+			sysData->appContext->goBack = true;
+			freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
+			free(now);
+			status = createUserMenu(sysData);
+			return status;
+		}
+		// for phone ends here
+
+		status = createUser(sysData, name, username, email, password, phone, roleID, userStatus, dateCreated, lastUpdated, lastLogin, dateDeleted);
+		freeUserDataVariable(name, username, email, password, phone, dateCreated, lastUpdated, lastLogin, dateDeleted);
+		free(now);
+		created = successful;
+
+		return status;
+	}
 	return status;
 }
+
+// TODO: REFACTOR UPDATE USER MENU
 
 StatusInfo updateUserProfileMenu(SystemData *sysData)
 {
