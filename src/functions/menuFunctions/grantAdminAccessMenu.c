@@ -31,7 +31,8 @@ StatusInfo grantAdminAccessMenu(SystemData *sysData)
 			printf("\n");
 			printf("Enter your choice [Digite sua opção]: ");
 			scanf("%d", &choice);
-			printf("\n");
+			
+			// printf("\n");
 
 			switch (choice)
 			{
@@ -357,6 +358,7 @@ StatusInfo createUserMenu(SystemData *sysData)
 		else
 		{
 			status = successful;
+			performUserOperationsMenu(sysData);
 			return status;
 		}
 
@@ -373,6 +375,7 @@ StatusInfo updateUserProfileMenu(SystemData *sysData)
 	StatusInfo status, updated = failed;
 
 	int choice;
+
 	if (currentUserRoleID == ROLE_ADMIN)
 	{
 		do
@@ -385,10 +388,19 @@ StatusInfo updateUserProfileMenu(SystemData *sysData)
 			centerStrings("Digite o ID do usuário que deseja atualizar. Digite 0 para voltar.\n");
 			printf("\n");
 			printf("\n");
-			printf("S/N   ID [ID]     NAME [NOME]\n");
+			printf("\tS/N   ID [ID]   ROLE    STATUS    NAME [NOME]\n");
+			printSymbols(SCREEN_WIDTH, '=');
 			for (size_t i = 0; i < sysData->userCount; i++)
 			{
-				printf("%ld     %d        %s\n", (i + 1), sysData->users[i].userID, sysData->users[i].name);
+				if (sysData->users[i].userStatus == active)
+				{
+					printf("\t%ld     %d      %d        %d         %s\n", (i + 1), sysData->users[i].userID, sysData->users[i].roleID, sysData->users[i].userStatus, sysData->users[i].name);
+				}
+				else
+				{
+					printf("\t%ld     %d      %d       %d         %s\n", (i + 1), sysData->users[i].userID, sysData->users[i].roleID, sysData->users[i].userStatus, sysData->users[i].name);
+				}
+				printSymbols(SCREEN_WIDTH, '-');
 			}
 			printf("\n");
 			printf("Enter user ID [Digite ID do usuário]: ");
@@ -397,6 +409,7 @@ StatusInfo updateUserProfileMenu(SystemData *sysData)
 			if (choice == 0)
 			{
 				performUserOperationsMenu(sysData);
+				updated = failed;
 			}
 			userIndex = (size_t)getUserIndexByID(sysData, choice); // getUserIndexByID()
 			size_t zerro = 0;
@@ -443,16 +456,19 @@ StatusInfo updateUserProfileMenu(SystemData *sysData)
 
 						// free(now);
 					} while ((choice < 0 || choice > 7));
+					// status = performUserOperationsMenu(sysData)
 				}
 				else if (questionToUpdate == 'n' || questionToUpdate == 'N')
 				{
 					status = performUserOperationsMenu(sysData);
+					clearInputBuffer();
 					updated = failed;
 				}
 			}
 			else
 			{
 				updated = failed;
+				status = failed;
 			}
 
 		} while (updated == failed && sysData->appContext->session == true && sysData->appContext->isAuthenticated == true && sysData->appContext->exitFlag == false);
@@ -470,18 +486,44 @@ StatusInfo viewAllUsersMenu(SystemData *sysData)
 	StatusInfo status;
 	do
 	{
+		int usersNotDeletedCount = 0, usersTempDeletedCount = 0;
 		displayBanner(sysData);
 		centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]\n");
 		centerStrings("VIEW ALL USERS MENU [MENU DE VISUALIZAR TODOS OS USUÁRIOS]");
 		printf("\n");
 
-		printf("S/N   ID [ID]     NAME [NOME]\n");
+		printf("\tS/N   ID [ID]     NAME [NOME]\n");
+		printSymbols(SCREEN_WIDTH, '=');
+
 		for (size_t i = 0; i < sysData->userCount; i++)
 		{
-			printf("%ld     %d        %s\n", (i + 1), sysData->users[i].userID, sysData->users[i].name);
+			if (sysData->users[i].userStatus == deleted)
+			{
+				usersTempDeletedCount++;
+				continue;
+			}
+			else
+			{
+				usersNotDeletedCount++;
+				printf("\t%d     %d        %s\n", usersNotDeletedCount, sysData->users[i].userID, sysData->users[i].name);
+				printSymbols(SCREEN_WIDTH, '-');
+			}
 		}
 		printf("\n\n");
-		printf("TOTAL USERS[TOTAL DE USUARIOS]:[ %ld ]\n", sysData->userCount);
+		if (sysData->appContext->currentUserRoleID == ROLE_ADMIN)
+		{
+			printSymbols(SCREEN_WIDTH, '=');
+
+			printf("TOTAL ACTIVE USERS[TOTAL DE USUARIOS ATIVOS]:                                  [%d]\n", usersNotDeletedCount);
+			printSymbols(SCREEN_WIDTH, '-');
+			printf("TOTAL USERS TEMPORARILY DELETED [TOTAL DE USUARIOS TEMPORARIAMENTE EXCLUIDOS]: [%d]\n", usersTempDeletedCount);
+			printSymbols(SCREEN_WIDTH, '-');
+			printf("TOTAL USERS[TOTAL DE USUARIOS]:                                                [%ld]\n", sysData->userCount);
+		}
+		else
+		{
+			printf("TOTAL USERS[TOTAL DE USUARIOS]:[ %d ]\n", usersNotDeletedCount);
+		}
 		printf("\n\n");
 		printf("Press 0 to go back [Pressione 0 para voltar]: ");
 		scanf("%d", &choice);
@@ -503,12 +545,169 @@ StatusInfo viewAllUsersMenu(SystemData *sysData)
 }
 StatusInfo searchForUserMenu(SystemData *sysData)
 {
-	StatusInfo status;
+	StatusInfo status, userFound = failed;
+
+	char searchCriteria[MAX_NAME_LENGTH];
+	do
+	{
+		displayBanner(sysData);
+		centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]\n");
+		centerStrings("SEARCH USER MENU [MENU DE BUSCA DE USUARIO]");
+		printf("\n");
+		clearInputBuffer();
+		centerStrings("Enter search criteria or press 0 to go back [Digite o criterio de busca ou pressione 0 para voltar]: ");
+		printf("\n");
+		printf("Enter search criteria [Digite o criterio de busca]: ");
+		scanf("%149[^\n]", searchCriteria);
+		if (searchCriteria[0] == '0' && strlen(searchCriteria) == 1)
+		{
+			status = performUserOperationsMenu(sysData);
+			userFound = failed;
+			status = failed;
+		}
+		else
+		{
+			int userID = searchForUser(sysData, searchCriteria);
+			if (userID < 0)
+			{
+				logPrintMessage(LOG_ERROR, "User not found  while searching. [Usuario nao encontrado na busca]", yes);
+				userFound = failed;
+				status = failed;
+			}
+			else
+			{
+				size_t userIndex = getUserIndexByID(sysData, userID);
+				if (userIndex != (size_t)failed)
+				{
+					userFound = successful;
+					int choice;
+					do
+					{
+						displayBanner(sysData);
+						centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]\n");
+						centerStrings("SEARCH USER MENU [MENU DE BUSCA DE USUARIO]");
+						printf("\n");
+						status = viewSingleUser(sysData, userIndex);
+						printf("\n\nEnter 0 to go back to search menu [Pressione 0 para voltar ao menu de busca]: ");
+						scanf("%d", &choice);
+						switch (choice)
+						{
+						case 0:
+							status = searchForUserMenu(sysData);
+							break;
+						default:
+							logPrintMessage(LOG_ERROR, "Invalid Input [Entrada Invalida]", yes);
+							clearInputBuffer();
+						}
+
+					} while (choice != 0);
+				}
+			}
+		}
+
+	} while (userFound == failed && sysData->appContext->session == true && sysData->appContext->isAuthenticated == true && sysData->appContext->exitFlag == false);
 	return status;
 }
 StatusInfo deleteUserProfileMenu(SystemData *sysData)
 {
 	StatusInfo status;
+	char questionToDelete;
+	size_t userIndex, zerro = 0;
+	int userID, userFound = false;
+	do
+	{
+		displayBanner(sysData);
+		centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]\n");
+		centerStrings("DELETE USER MENU [MENU DE EXCLUSÃO DE USUARIO]");
+		printf("\n");
+		int usersNotDeletedCount = 0, usersTempDeletedCount = 0;
+
+		printf("\tS/N   ID [ID]     NAME [NOME]\n");
+		printSymbols(SCREEN_WIDTH, '=');
+
+		for (size_t i = 0; i < sysData->userCount; i++)
+		{
+			if (sysData->users[i].userStatus == deleted)
+			{
+				usersTempDeletedCount++;
+				continue;
+			}
+			else
+			{
+				usersNotDeletedCount++;
+				printf("\t%d     %d        %s\n", usersNotDeletedCount, sysData->users[i].userID, sysData->users[i].name);
+				printSymbols(SCREEN_WIDTH, '-');
+			}
+		}
+		printf("\n\n");
+		if (sysData->appContext->currentUserRoleID == ROLE_ADMIN)
+		{
+			printSymbols(SCREEN_WIDTH, '=');
+
+			printf("TOTAL ACTIVE USERS[TOTAL DE USUARIOS ATIVOS]:                                  [%d]\n", usersNotDeletedCount);
+			printSymbols(SCREEN_WIDTH, '-');
+			printf("TOTAL USERS TEMPORARILY DELETED [TOTAL DE USUARIOS TEMPORARIAMENTE EXCLUIDOS]: [%d]\n", usersTempDeletedCount);
+			printSymbols(SCREEN_WIDTH, '-');
+			printf("TOTAL USERS[TOTAL DE USUARIOS]:                                                [%ld]\n", sysData->userCount);
+		}
+		else
+		{
+			printf("TOTAL USERS[TOTAL DE USUARIOS]:[ %d ]\n", usersNotDeletedCount);
+		}
+		printf("\n\n");
+		centerStrings("Enter user ID to delete or 0 to go back to user menu [Pressione 0 para voltar ao menu de usuario]\n\n");
+
+		printf("Enter user ID [Digite o ID do usuário]: ");
+
+		scanf("%d", &userID);
+		if (userID == 0)
+		{
+			status = performUserOperationsMenu(sysData);
+			userFound = false;
+		}
+		userIndex = (size_t)getUserIndexByID(sysData, userID);
+
+		if (userIndex >= zerro && userIndex < sysData->userCount)
+		{
+			do
+			{
+				displayBanner(sysData);
+				centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]\n");
+				centerStrings("DELETE USER MENU [MENU DE EXCLUSÃO DE USUARIO]");
+				printf("\n");
+				viewSingleUser(sysData, userIndex);
+				printf("\n\n");
+				centerStrings("Are you sure you want to delete this user?(y/n)");
+				centerStrings("[Tem certeza que deseja excluir esse usuario? (s/n)]\n\n");
+				scanf(" %c", &questionToDelete);
+				if (questionToDelete != 'y' && questionToDelete != 'Y' && questionToDelete != 's' && questionToDelete != 'S' && questionToDelete != 'n' && questionToDelete != 'N')
+				{
+					logPrintMessage(LOG_ERROR, "Invalid Input [Entrada Invalida]", yes);
+
+					clearInputBuffer();
+				}
+			} while (questionToDelete != 'y' && questionToDelete != 'Y' && questionToDelete != 's' && questionToDelete != 'S' && questionToDelete != 'n' && questionToDelete != 'N');
+			if (questionToDelete == 'y' || questionToDelete == 'Y' || questionToDelete == 's' || questionToDelete == 'S')
+			{
+				char *now = getCurrentDateTime(TYPE_DATETIME);
+				sysData->users[userIndex].userStatus = deleted;
+
+				strcpy(sysData->users[userIndex].lastUpdated, now);
+
+				strcpy(sysData->users[userIndex].dateDeleted, now);
+				// saveSystemData(sysData);
+				status = successful;
+				userFound = true;
+			}
+		}
+		else
+		{
+			status = failed;
+			userFound = false;
+			clearInputBuffer();
+		}
+
+	} while (userFound == false && sysData->appContext->session == true && sysData->appContext->isAuthenticated == true && sysData->appContext->exitFlag == false);
 	return status;
 }
 

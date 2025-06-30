@@ -175,9 +175,12 @@ void logoutUser(SystemData *sysData)
 	} while (choice != 'y' && choice != 'Y' && choice != 's' && choice != 'S' && choice != 'n' && choice != 'N');
 	if (choice == 'y' || choice == 'Y' || choice == 's' || choice == 'S')
 	{
+		char *now = getCurrentDateTime(TYPE_DATETIME);
 		logPrintMessage(LOG_INFO, "Logging out... [Deslogando...]", yes);
 		processing();
 		logPrintMessage(LOG_INFO, "Logout successful [Logout realizado com sucesso]", yes);
+		size_t userIndex = getUserIndexByID(sysData, sysData->appContext->currentUserID);
+		strcpy(sysData->users[userIndex].lastUpdated, now);
 		sysData->appContext->session = false;
 		sysData->appContext->isAuthenticated = false;
 		sysData->appContext->currentUserRoleID = 0;
@@ -279,30 +282,31 @@ StatusInfo viewSingleUser(SystemData *sysData, size_t userIndex)
 		return failed;
 	}
 	printf("\n");
-	centerStrings("===== USER DATA [DADOS DO USUARIO] =====\n");
+	centerStrings("===== USER DATA [DADOS DO USUARIO] =====\n\n");
 	printSymbols(SCREEN_WIDTH, '-');
-	printf("ID [ID do usuário]:                            %d\n", sysData->users[userIndex].userID);
+	printf("\tID [ID do usuário]:                            %d\n", sysData->users[userIndex].userID);
 	printSymbols(SCREEN_WIDTH, '-');
-	printf("Name [Nome do usuário]:                        %s\n", sysData->users[userIndex].name);
+	printf("\tName [Nome do usuário]:                        %s\n", sysData->users[userIndex].name);
 	printSymbols(SCREEN_WIDTH, '-');
-	printf("Username [Username do usuário]:                %s\n", sysData->users[userIndex].username);
+	printf("\tUsername [Username do usuário]:                %s\n", sysData->users[userIndex].username);
 	printSymbols(SCREEN_WIDTH, '-');
-	printf("Email [Email do usuário]:                      %s\n", sysData->users[userIndex].email);
-	// printf("User Password [Senha do usuário]: %s\n", sysData->users[userIndex].password);
+	printf("\tEmail [Email do usuário]:                      %s\n", sysData->users[userIndex].email);
 	printSymbols(SCREEN_WIDTH, '-');
-	printf("Phone [Telefone do usuário]:                   %s\n", sysData->users[userIndex].phone);
+	printf("\tUser Password [Senha do usuário]: %.50s\n", sysData->users[userIndex].password);
 	printSymbols(SCREEN_WIDTH, '-');
-	printf("Role [Papel do usuário]:                       %d\n", sysData->users[userIndex].roleID);
+	printf("\tPhone [Telefone do usuário]:                   %s\n", sysData->users[userIndex].phone);
 	printSymbols(SCREEN_WIDTH, '-');
-	printf("Status [Status do usuário]:                    %d\n", sysData->users[userIndex].userStatus);
+	printf("\tRole [Papel do usuário]:                       %d\n", sysData->users[userIndex].roleID);
 	printSymbols(SCREEN_WIDTH, '-');
-	printf("Date Created [Data de criação do usuário]:     %s\n", sysData->users[userIndex].dateCreated);
+	printf("\tStatus [Status do usuário]:                    %d\n", sysData->users[userIndex].userStatus);
 	printSymbols(SCREEN_WIDTH, '-');
-	printf("Last Updated [Data de atualização do usuário]: %s\n", sysData->users[userIndex].lastUpdated);
+	printf("\tDate Created [Data de criação do usuário]:     %s\n", sysData->users[userIndex].dateCreated);
 	printSymbols(SCREEN_WIDTH, '-');
-	printf("Last Login [Data de login do usuário]:         %s\n", sysData->users[userIndex].lastLogin);
+	printf("\tLast Updated [Data de atualização do usuário]: %s\n", sysData->users[userIndex].lastUpdated);
 	printSymbols(SCREEN_WIDTH, '-');
-	printf("Date Deleted [Data de exclusão do usuário]:    %s\n", sysData->users[userIndex].dateDeleted);
+	printf("\tLast Login [Data de login do usuário]:         %s\n", sysData->users[userIndex].lastLogin);
+	printSymbols(SCREEN_WIDTH, '-');
+	printf("\tDate Deleted [Data de exclusão do usuário]:    %s\n", sysData->users[userIndex].dateDeleted);
 	printSymbols(SCREEN_WIDTH, '-');
 	return successful;
 }
@@ -346,5 +350,33 @@ double getCurrencyRateToOneKz(SystemData *sysData, int currencyID)
 			return sysData->currencies[i].rate;
 		}
 	}
+	return failed;
+}
+
+int searchForUser(SystemData *sysData, char *searchCriteria)
+{
+	char *tempSearchCriteria = malloc(MAX_NAME_LENGTH * sizeof(char));
+	if (!tempSearchCriteria)
+	{
+		logPrintMessage(LOG_ERROR, "Failed to allocate memory for tempSearchCriteria [ Falha ao alocar memoria para tempSearchCriteria ]", yes);
+		return failed;
+	}
+
+	strcpy(tempSearchCriteria, searchCriteria);
+
+	int result, tempIntSearch = atoi(tempSearchCriteria);
+
+	for (size_t i = 0; i < sysData->userCount; i++)
+	{
+		if ((sysData->users[i].userID == tempIntSearch) || (sysData->users[i].name && strcmp(sysData->users[i].name, searchCriteria) == 0) || (sysData->users[i].email && strcmp(sysData->users[i].email, searchCriteria) == 0) || (sysData->users[i].phone && strcmp(sysData->users[i].phone, searchCriteria) == 0) || (sysData->users[i].username && strcmp(sysData->users[i].username, searchCriteria) == 0))
+		{
+			result = sysData->users[i].userID;
+			free(tempSearchCriteria);
+			// clearInputBuffer();
+			return result;
+		}
+	}
+
+	free(tempSearchCriteria);
 	return failed;
 }

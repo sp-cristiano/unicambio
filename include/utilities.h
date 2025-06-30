@@ -17,7 +17,7 @@ void processing();
 int getUserIndexByID(SystemData *sysData, int userID);
 void logoutUser(SystemData *sysData);
 void clearInputBuffer();
-int getUserIDByMultipleSearch(SystemData *sysData, char *multiSearch);
+int searchForUser(SystemData *sysData, char *searchCriteria);
 StatusInfo viewSingleUser(SystemData *sysData, size_t userIndex);
 void selectOptionToUpdateUserByAdmin();
 double convertRateToOneKz(double rate);

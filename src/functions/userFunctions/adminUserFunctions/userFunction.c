@@ -71,7 +71,7 @@ StatusInfo createUser(SystemData *sysData, char *name, char *username, char *ema
 		if (!hashedPassword)
 		{
 			logPrintMessage(LOG_ERROR, "Failed to hash password [ Falha ao hashar a senha ]", yes);
-			free(hashedPassword);
+			// free(hashedPassword);
 			status = failed;
 			return status;
 		}
@@ -82,6 +82,7 @@ StatusInfo createUser(SystemData *sysData, char *name, char *username, char *ema
 		if (sysData->users[sysData->userCount].name == NULL)
 		{
 			logPrintMessage(LOG_ERROR, "Failed to save user name [ Falha ao salvar o nome do usuário ]", yes);
+			free(hashedPassword);
 			status = failed;
 			return status;
 		}
@@ -92,6 +93,7 @@ StatusInfo createUser(SystemData *sysData, char *name, char *username, char *ema
 			logPrintMessage(LOG_ERROR, "Failed to save user username [ Falha ao salvar o username do usuário ]", yes);
 			status = failed;
 			free(sysData->users[sysData->userCount].name);
+			free(hashedPassword);
 			return status;
 		}
 
@@ -102,9 +104,10 @@ StatusInfo createUser(SystemData *sysData, char *name, char *username, char *ema
 			status = failed;
 			free(sysData->users[sysData->userCount].username);
 			free(sysData->users[sysData->userCount].name);
+			free(hashedPassword);
 			return status;
 		}
-		sysData->users[sysData->userCount].password = hashedPassword;
+		sysData->users[sysData->userCount].password = strdup(hashedPassword);
 		if (sysData->users[sysData->userCount].password == NULL)
 		{
 			logPrintMessage(LOG_ERROR, "Failed to save user password [ Falha ao salvar a senha do usuário ]", yes);
@@ -112,6 +115,7 @@ StatusInfo createUser(SystemData *sysData, char *name, char *username, char *ema
 			free(sysData->users[sysData->userCount].email);
 			free(sysData->users[sysData->userCount].username);
 			free(sysData->users[sysData->userCount].name);
+			free(hashedPassword);
 			return status;
 		}
 		sysData->users[sysData->userCount].phone = strdup(phone);
@@ -123,6 +127,8 @@ StatusInfo createUser(SystemData *sysData, char *name, char *username, char *ema
 			free(sysData->users[sysData->userCount].email);
 			free(sysData->users[sysData->userCount].username);
 			free(sysData->users[sysData->userCount].name);
+			free(hashedPassword);
+
 			return status;
 		}
 		sysData->users[sysData->userCount].roleID = roleID;
@@ -139,6 +145,8 @@ StatusInfo createUser(SystemData *sysData, char *name, char *username, char *ema
 			free(sysData->users[sysData->userCount].email);
 			free(sysData->users[sysData->userCount].username);
 			free(sysData->users[sysData->userCount].name);
+			free(hashedPassword);
+
 			return status;
 		}
 		sysData->users[sysData->userCount].lastUpdated = strdup(lastUpdated);
@@ -152,6 +160,8 @@ StatusInfo createUser(SystemData *sysData, char *name, char *username, char *ema
 			free(sysData->users[sysData->userCount].email);
 			free(sysData->users[sysData->userCount].username);
 			free(sysData->users[sysData->userCount].name);
+			free(hashedPassword);
+
 			return status;
 		}
 		sysData->users[sysData->userCount].lastLogin = strdup(lastLogin);
@@ -166,6 +176,8 @@ StatusInfo createUser(SystemData *sysData, char *name, char *username, char *ema
 			free(sysData->users[sysData->userCount].email);
 			free(sysData->users[sysData->userCount].username);
 			free(sysData->users[sysData->userCount].name);
+			free(hashedPassword);
+
 			return status;
 		}
 		sysData->users[sysData->userCount].dateDeleted = strdup(dateDeleted);
@@ -181,6 +193,8 @@ StatusInfo createUser(SystemData *sysData, char *name, char *username, char *ema
 			free(sysData->users[sysData->userCount].email);
 			free(sysData->users[sysData->userCount].username);
 			free(sysData->users[sysData->userCount].name);
+			free(hashedPassword);
+
 			return status;
 		}
 
@@ -382,9 +396,11 @@ StatusInfo freeMemoryAllocatedToUserStructure(SystemData *sysData)
 
 StatusInfo updateUser(SystemData *sysData, size_t userIndex, int choice, char *now, StatusInfo updated, StatusInfo status)
 {
-
+	int goBack = sysData->appContext->goBack;
+	status = status;
 	switch (choice)
 	{
+
 	case 0:
 		status = performUserOperationsMenu(sysData);
 		updated = failed;
@@ -394,14 +410,30 @@ StatusInfo updateUser(SystemData *sysData, size_t userIndex, int choice, char *n
 
 		printf("User Name to update %s [Nome de usuário para atualizar %s]\n", sysData->users[userIndex].name, sysData->users[userIndex].name);
 		printf("Enter New User Name [Digite o novo nome do usuário]: ");
-		// clearInputBuffer();
 		scanf("%149[^\n]", name);
+		clearInputBuffer();
 		strcpy(sysData->users[userIndex].name, name);
 		strcpy(sysData->users[userIndex].lastUpdated, now);
 		updated = saveSystemData(sysData);
+		status = successful;
 		// free(name);
 		// free(now);
-		viewSingleUser(sysData, userIndex);
+		// do{
+		// 	displayBanner(sysData);
+		// 	centerStrings("ADMIN MENU [MENU DO ADMINISTRADOR]\n");
+		// 	centerStrings("UPDATE USER PROFILE [ATUALIZAR PERFIL DE USUARIO]");
+		// 	printf("\n");
+		// 	viewSingleUser(sysData, userIndex);
+		// 	printf("Press 0 to go back to user menu [Pressione 0 para voltar ao menu de usuário]: ");
+		// 	scanf("%d", &goBack);
+		// 	clearInputBuffer();
+		// }while(goBack != 0);
+		// if (goBack == 0)
+		// {
+		// 	status = performUserOperationsMenu(sysData);
+		// 	updated = failed;
+		// }
+
 		break;
 	case 2:
 		char *username = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
@@ -412,9 +444,11 @@ StatusInfo updateUser(SystemData *sysData, size_t userIndex, int choice, char *n
 		strcpy(sysData->users[userIndex].username, username);
 		strcpy(sysData->users[userIndex].lastUpdated, now);
 		updated = saveSystemData(sysData);
+		status = successful;
 		// free(username);
 		// free(now);
 		viewSingleUser(sysData, userIndex);
+
 		break;
 	case 3:
 		char *email = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
@@ -425,6 +459,7 @@ StatusInfo updateUser(SystemData *sysData, size_t userIndex, int choice, char *n
 		strcpy(sysData->users[userIndex].email, email);
 		strcpy(sysData->users[userIndex].lastUpdated, now);
 		updated = saveSystemData(sysData);
+		status = successful;
 		// free(email);
 		// free(now);
 		viewSingleUser(sysData, userIndex);
@@ -432,7 +467,7 @@ StatusInfo updateUser(SystemData *sysData, size_t userIndex, int choice, char *n
 	case 4:
 		char *password = (char *)malloc(MAX_PASSWORD_LENGTH * sizeof(char));
 
-		printf("User Password to update %s [Senha de usuário para atualizar %s]\n", sysData->users[userIndex].password, sysData->users[userIndex].password);
+		printf("User Password to update %.10s... [Senha de usuário para atualizar %.10s...]\n", sysData->users[userIndex].password, sysData->users[userIndex].password);
 		if (!password)
 		{
 			logPrintMessage(LOG_ERROR, "Failed to allocate memory for password update [Falha ao alocar memória]", yes);
@@ -442,11 +477,13 @@ StatusInfo updateUser(SystemData *sysData, size_t userIndex, int choice, char *n
 
 		printf("Enter New User Password [Digite a nova senha do usuário]: ");
 		clearInputBuffer();
+		// scanf("%299[^\n]", password);
 		scanf("%s", password);
 		char *hashedPWD = hashPassword(password);
 		strcpy(sysData->users[userIndex].password, hashedPWD);
 		strcpy(sysData->users[userIndex].lastUpdated, now);
 		updated = saveSystemData(sysData);
+		status = successful;
 		// free(hashedPWD);
 		// free(password);
 		// free(now);
@@ -463,6 +500,7 @@ StatusInfo updateUser(SystemData *sysData, size_t userIndex, int choice, char *n
 		strcpy(sysData->users[userIndex].phone, phone);
 		strcpy(sysData->users[userIndex].lastUpdated, now);
 		updated = saveSystemData(sysData);
+		status = successful;
 		// free(phone);
 		// free(now);
 		viewSingleUser(sysData, userIndex);
@@ -474,6 +512,7 @@ StatusInfo updateUser(SystemData *sysData, size_t userIndex, int choice, char *n
 		scanf("%d", &sysData->users[userIndex].roleID);
 		sysData->users[userIndex].lastUpdated = now;
 		updated = saveSystemData(sysData);
+		status = successful;
 		// free(now);
 		viewSingleUser(sysData, userIndex);
 		break;
@@ -485,10 +524,12 @@ StatusInfo updateUser(SystemData *sysData, size_t userIndex, int choice, char *n
 		updated = saveSystemData(sysData);
 		// free(now);
 		viewSingleUser(sysData, userIndex);
+		status = successful;
 		break;
 	default:
 		logPrintMessage(LOG_WARNING, "Invalid Input [Entrada Invalida]", yes);
 		updated = failed;
+		status = failed;
 		clearInputBuffer();
 		// free(now);
 		break;

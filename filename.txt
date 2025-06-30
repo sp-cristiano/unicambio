@@ -1,0 +1,3 @@
+This is the latest changes made:
+I am learning how to use VIM as my favourite editor as a linux user.
+
